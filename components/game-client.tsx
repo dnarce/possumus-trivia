@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -30,7 +30,7 @@ export function GameClient({ questions, sessionId, categoryId, difficulty }: Gam
     setSelectedOption(option)
   }
 
-  function handleNext() {
+  const handleNext = useCallback(() => {
     const answer: PlayerAnswer = {
       questionIndex: currentIndex,
       selectedOption: selectedOption!,
@@ -49,7 +49,13 @@ export function GameClient({ questions, sessionId, categoryId, difficulty }: Gam
       setCurrentIndex(currentIndex + 1)
       setSelectedOption(null)
     }
-  }
+  }, [answers, categoryId, currentIndex, currentQuestion, difficulty, isLastQuestion, router, selectedOption, sessionId])
+
+  useEffect(() => {
+    if (!isLastQuestion || selectedOption === null) return
+    const timer = setTimeout(handleNext, 1000)
+    return () => clearTimeout(timer)
+  }, [isLastQuestion, selectedOption, handleNext])
 
   function getOptionVariant(option: string): 'outline' | 'default' | 'destructive' {
     if (!isAnswered) return 'outline'
@@ -82,9 +88,11 @@ export function GameClient({ questions, sessionId, categoryId, difficulty }: Gam
         </CardContent>
       </Card>
 
-      <Button className="w-full" disabled={!isAnswered} onClick={handleNext}>
-        {isLastQuestion ? 'See results' : 'Next'}
-      </Button>
+      {!isLastQuestion && (
+        <Button className="w-full" disabled={!isAnswered} onClick={handleNext}>
+          Next
+        </Button>
+      )}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -22,7 +22,7 @@ export function ResultClient({ sessionId, categoryId, difficulty, restartAction 
   const router = useRouter()
   const [result, setResult] = useState<GameResult | null>(null)
 
-  useEffect(() => {
+  const loadResult = useCallback(() => {
     const stored = sessionStorage.getItem(`game-${sessionId}`)
     if (stored) {
       setResult(JSON.parse(stored))
@@ -30,6 +30,10 @@ export function ResultClient({ sessionId, categoryId, difficulty, restartAction 
       router.replace('/')
     }
   }, [sessionId, router])
+
+  useEffect(() => {
+    loadResult()
+  }, [loadResult])
 
   if (!result) return null
 
