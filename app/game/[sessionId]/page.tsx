@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation'
 import { fetchQuestions } from '@/lib/opentdb'
 import { mapQuestion } from '@/lib/mappers'
 import { GameClient } from '@/components/game-client'
@@ -20,12 +21,15 @@ export default async function GamePage({ params, searchParams }: GamePageProps) 
   }
 
   const raw = await fetchQuestions(sessionId, config)
+
+  if (raw.response_code !== 0) redirect('/')
+
   const questions = raw.results.map((q, i) => mapQuestion(q, i))
 
   return (
     <main className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-lg px-4">
-        <GameClient questions={questions} sessionId={sessionId} />
+        <GameClient questions={questions} sessionId={sessionId} categoryId={Number(categoryId)} difficulty={difficulty} />
       </div>
     </main>
   )

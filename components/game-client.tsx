@@ -6,12 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import type { Question, PlayerAnswer } from '@/types/trivia'
 
+const POINTS_PER_CORRECT = 20
+
 interface GameClientProps {
   questions: Question[]
   sessionId: string
+  categoryId: number
+  difficulty: string
 }
 
-export function GameClient({ questions, sessionId }: GameClientProps) {
+export function GameClient({ questions, sessionId, categoryId, difficulty }: GameClientProps) {
   const router = useRouter()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedOption, setSelectedOption] = useState<string | null>(null)
@@ -38,9 +42,9 @@ export function GameClient({ questions, sessionId }: GameClientProps) {
     setAnswers(updatedAnswers)
 
     if (isLastQuestion) {
-      const score = updatedAnswers.filter((a) => a.isCorrect).length
+      const score = updatedAnswers.filter((a) => a.isCorrect).length * POINTS_PER_CORRECT
       sessionStorage.setItem(`game-${sessionId}`, JSON.stringify({ answers: updatedAnswers, score }))
-      router.push(`/game/${sessionId}/result`)
+      router.push(`/game/${sessionId}/result?categoryId=${categoryId}&difficulty=${difficulty}`)
     } else {
       setCurrentIndex(currentIndex + 1)
       setSelectedOption(null)
