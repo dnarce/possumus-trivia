@@ -61,7 +61,7 @@ export function GameClient({ questions, sessionId, categoryId, difficulty }: Gam
   return (
     <div className="space-y-6">
       <p className="text-sm text-muted-foreground">
-        Pregunta {currentIndex + 1} de {questions.length}
+        Question {currentIndex + 1} of {questions.length}
       </p>
 
       <Card>
@@ -83,7 +83,7 @@ export function GameClient({ questions, sessionId, categoryId, difficulty }: Gam
       </Card>
 
       <Button className="w-full" disabled={!isAnswered} onClick={handleNext}>
-        {isLastQuestion ? 'Ver resultados' : 'Siguiente'}
+        {isLastQuestion ? 'See results' : 'Next'}
       </Button>
     </div>
   )
