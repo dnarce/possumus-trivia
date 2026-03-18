@@ -25,11 +25,17 @@ export interface Category {
   name: string
 }
 
+export const TRIVIA_DEFAULTS = {
+  amount: 5 as const,
+  type: 'multiple' as const,
+}
+
 export interface TriviaConfig {
   categoryId: number
   categoryName: string
   difficulty: 'easy' | 'medium' | 'hard'
-  amount: 5
+  amount?: number
+  type?: 'multiple' | 'boolean'
 }
 
 export interface Question {

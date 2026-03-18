@@ -1,4 +1,5 @@
 import type { OpenTDBCategoriesResponse, OpenTDBQuestionsResponse, TriviaConfig } from '@/types/trivia'
+import { TRIVIA_DEFAULTS } from '@/types/trivia'
 
 const BASE_URL = process.env.OPENTDB_BASE_URL ?? 'https://opentdb.com'
 
@@ -19,10 +20,12 @@ export async function fetchCategories(): Promise<OpenTDBCategoriesResponse> {
 }
 
 export async function fetchQuestions(sessionId: string, config: TriviaConfig): Promise<OpenTDBQuestionsResponse> {
+  const { amount = TRIVIA_DEFAULTS.amount, type = TRIVIA_DEFAULTS.type } = config
   const params = new URLSearchParams({
-    amount: String(config.amount),
+    amount: String(amount),
     category: String(config.categoryId),
     difficulty: config.difficulty,
+    type,
     token: sessionId,
   })
   const res = await fetch(`${BASE_URL}/api.php?${params}`)
