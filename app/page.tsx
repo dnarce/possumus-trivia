@@ -1,11 +1,7 @@
-import Image from "next/image";
-
-export default function Home() {
+export default function SetupPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">Trivia Game</h1>
-      </main>
-    </div>
+    <main>
+      <h1>Configurá tu partida</h1>
+    </main>
   );
 }
