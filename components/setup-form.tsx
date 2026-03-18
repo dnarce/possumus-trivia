@@ -22,13 +22,13 @@ export function SetupForm({ categories, action }: SetupFormProps) {
   const [categoryId, setCategoryId] = useState('')
 
   return (
-    <form action={action}>
+    <form action={action} className="space-y-6">
       <input type="hidden" name="categoryId" value={categoryId} />
 
-      <div>
+      <div className="space-y-2">
         <Label>Categoría</Label>
         <Select onValueChange={setCategoryId}>
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder="Seleccioná una categoría" />
           </SelectTrigger>
           <SelectContent>
@@ -43,19 +43,19 @@ export function SetupForm({ categories, action }: SetupFormProps) {
         </Select>
       </div>
 
-      <div>
+      <div className="space-y-3">
         <Label>Dificultad</Label>
-        <RadioGroup name="difficulty" defaultValue="easy">
+        <RadioGroup name="difficulty" defaultValue="easy" className="flex gap-6">
           {DIFFICULTIES.map(({ value, label }) => (
-            <div key={value} className="flex items-center gap-3">
+            <div key={value} className="flex items-center gap-2">
               <RadioGroupItem value={value} id={value} />
-              <Label htmlFor={value}>{label}</Label>
+              <Label htmlFor={value} className="cursor-pointer">{label}</Label>
             </div>
           ))}
         </RadioGroup>
       </div>
 
-      <Button type="submit" disabled={!categoryId}>
+      <Button type="submit" disabled={!categoryId} className="w-full">
         Jugar!
       </Button>
     </form>
