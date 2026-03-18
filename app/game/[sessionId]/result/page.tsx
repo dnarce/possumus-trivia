@@ -13,7 +13,7 @@ export default async function ResultPage({ params, searchParams }: ResultPagePro
   return (
     <main className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-sm space-y-6 px-4">
-        <h1 className="text-3xl font-bold tracking-tight">Resultados</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Results</h1>
         <ResultClient
           sessionId={sessionId}
           categoryId={categoryId}

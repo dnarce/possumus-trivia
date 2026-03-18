@@ -13,9 +13,9 @@ interface SetupFormProps {
 }
 
 const DIFFICULTIES = [
-  { value: 'easy', label: 'Fácil' },
-  { value: 'medium', label: 'Media' },
-  { value: 'hard', label: 'Difícil' },
+  { value: 'easy', label: 'Easy' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'hard', label: 'Hard' },
 ]
 
 export function SetupForm({ categories, action }: SetupFormProps) {
@@ -26,10 +26,10 @@ export function SetupForm({ categories, action }: SetupFormProps) {
       <input type="hidden" name="categoryId" value={categoryId} />
 
       <div className="space-y-2">
-        <Label>Categoría</Label>
+        <Label>Category</Label>
         <Select onValueChange={setCategoryId}>
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Seleccioná una categoría" />
+            <SelectValue placeholder="Select a category" />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
@@ -44,7 +44,7 @@ export function SetupForm({ categories, action }: SetupFormProps) {
       </div>
 
       <div className="space-y-3">
-        <Label>Dificultad</Label>
+        <Label>Difficulty</Label>
         <RadioGroup name="difficulty" defaultValue="easy" className="flex gap-6">
           {DIFFICULTIES.map(({ value, label }) => (
             <div key={value} className="flex items-center gap-2">
@@ -56,7 +56,7 @@ export function SetupForm({ categories, action }: SetupFormProps) {
       </div>
 
       <Button type="submit" disabled={!categoryId} className="w-full">
-        Jugar!
+        Play!
       </Button>
     </form>
   )

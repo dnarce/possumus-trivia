@@ -1,6 +1,6 @@
 import type { OpenTDBCategoriesResponse, OpenTDBQuestionsResponse, TriviaConfig } from '@/types/trivia'
 
-const BASE_URL = 'https://opentdb.com'
+const BASE_URL = process.env.OPENTDB_BASE_URL ?? 'https://opentdb.com'
 
 interface OpenTDBTokenResponse {
   response_code: number

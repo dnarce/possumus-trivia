@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fetchSession, fetchCategories, fetchQuestions } from '@/lib/opentdb'
 import type { TriviaConfig } from '@/types/trivia'
 
+const BASE_URL = process.env.OPENTDB_BASE_URL ?? 'https://opentdb.com'
+
 const mockConfig: TriviaConfig = {
   categoryId: 9,
   categoryName: 'General Knowledge',
@@ -34,7 +36,7 @@ describe('fetchSession', () => {
     await fetchSession()
 
     expect(global.fetch).toHaveBeenCalledWith(
-      'https://opentdb.com/api_token.php?command=request'
+      `${BASE_URL}/api_token.php?command=request`
     )
   })
 })
@@ -45,7 +47,7 @@ describe('fetchCategories', () => {
 
     await fetchCategories()
 
-    expect(global.fetch).toHaveBeenCalledWith('https://opentdb.com/api_category.php')
+    expect(global.fetch).toHaveBeenCalledWith(`${BASE_URL}/api_category.php`)
   })
 
   it('returns the API response', async () => {

@@ -1,0 +1,133 @@
+import { test, expect, type Page } from '@playwright/test'
+
+// Answers match the mock questions defined in app/api/mock-opentdb/[...slug]/route.ts
+const CORRECT_ANSWERS = ['Paris', '4', 'Blue', '7', 'Jupiter']
+const WRONG_ANSWERS = ['Madrid', '3', 'Red', '5', 'Saturn']
+
+async function selectCategory(page: Page, name: string) {
+  await page.getByRole('combobox').click()
+  await page.getByRole('option', { name }).click()
+}
+
+async function startGame(page: Page) {
+  await page.goto('/')
+  await selectCategory(page, 'General Knowledge')
+  await page.getByLabel('Easy').click()
+  await page.getByRole('button', { name: 'Play!' }).click()
+  await page.waitForURL('**/game/**')
+}
+
+async function completeGame(page: Page, answers: string[]) {
+  for (let i = 0; i < answers.length - 1; i++) {
+    await page.getByRole('button', { name: answers[i] }).click()
+    await page.getByRole('button', { name: 'Next', exact: true }).click()
+  }
+  await page.getByRole('button', { name: answers[answers.length - 1] }).click()
+  await page.getByRole('button', { name: 'See results' }).click()
+  await page.waitForURL('**/result**')
+}
+
+test.describe('Trivia game flow', () => {
+
+  test('setup page shows categories and difficulty options', async ({ page }) => {
+    await page.goto('/')
+
+    await expect(page.getByRole('combobox')).toBeVisible()
+    await expect(page.getByLabel('Easy')).toBeVisible()
+    await expect(page.getByLabel('Medium')).toBeVisible()
+    await expect(page.getByLabel('Hard')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Play!' })).toBeVisible()
+  })
+
+  test('redirects to /game/[sessionId] after submitting setup', async ({ page }) => {
+    await startGame(page)
+
+    expect(page.url()).toContain('/game/')
+    expect(page.url()).toContain('categoryId=9')
+    expect(page.url()).toContain('difficulty=easy')
+  })
+
+  test('shows first question and answer options', async ({ page }) => {
+    await startGame(page)
+
+    await expect(page.getByText('Question 1 of 5')).toBeVisible()
+    await expect(page.getByText('What is the capital of France?')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Paris' })).toBeVisible()
+  })
+
+  test('Next button is disabled before answering', async ({ page }) => {
+    await startGame(page)
+
+    await expect(page.getByRole('button', { name: 'Next', exact: true })).toBeDisabled()
+  })
+
+  test('Next button is enabled after selecting an answer', async ({ page }) => {
+    await startGame(page)
+
+    await page.getByRole('button', { name: 'Paris' }).click()
+    await expect(page.getByRole('button', { name: 'Next', exact: true })).toBeEnabled()
+  })
+
+  test('advances to next question after clicking Next', async ({ page }) => {
+    await startGame(page)
+
+    await page.getByRole('button', { name: 'Paris' }).click()
+    await page.getByRole('button', { name: 'Next', exact: true }).click()
+
+    await expect(page.getByText('Question 2 of 5')).toBeVisible()
+    await expect(page.getByText('How much is 2 + 2?')).toBeVisible()
+  })
+
+  test('shows "See results" on the last question', async ({ page }) => {
+    await startGame(page)
+
+    for (let i = 0; i < CORRECT_ANSWERS.length - 1; i++) {
+      await page.getByRole('button', { name: CORRECT_ANSWERS[i] }).click()
+      await page.getByRole('button', { name: 'Next', exact: true }).click()
+    }
+
+    await expect(page.getByRole('button', { name: 'See results' })).toBeVisible()
+  })
+
+  test('redirects to result page after finishing the game', async ({ page }) => {
+    await startGame(page)
+    await completeGame(page, CORRECT_ANSWERS)
+
+    expect(page.url()).toContain('/result')
+  })
+
+  test('shows correct score when all answers are correct (100 points)', async ({ page }) => {
+    await startGame(page)
+    await completeGame(page, CORRECT_ANSWERS)
+
+    await expect(page.getByText('100 pts')).toBeVisible()
+  })
+
+  test('shows correct score when no answers are correct (0 points)', async ({ page }) => {
+    await startGame(page)
+    await completeGame(page, WRONG_ANSWERS)
+
+    await expect(page.getByText('0 pts')).toBeVisible()
+  })
+
+  test('Restart button replays with same config', async ({ page }) => {
+    await startGame(page)
+    await completeGame(page, CORRECT_ANSWERS)
+
+    await page.getByRole('button', { name: 'Restart' }).click()
+
+    await page.waitForURL('**/game/**')
+    expect(page.url()).toContain('categoryId=9')
+    expect(page.url()).toContain('difficulty=easy')
+  })
+
+  test('Exit button redirects to setup page', async ({ page }) => {
+    await startGame(page)
+    await completeGame(page, CORRECT_ANSWERS)
+
+    await page.getByRole('link', { name: 'Exit' }).click()
+
+    await page.waitForURL('/')
+    expect(page.url()).toBe('http://localhost:3000/')
+  })
+})
