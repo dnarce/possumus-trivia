@@ -58,9 +58,9 @@ export function GameClient({ questions, sessionId, categoryId, difficulty }: Gam
     return () => clearTimeout(timer)
   }, [isLastQuestion, selectedOption, handleNext])
 
-  function getOptionVariant(option: string): 'outline' | 'default' | 'destructive' {
+  function getOptionVariant(option: string): 'outline' | 'success' | 'destructive' {
     if (!isAnswered) return 'outline'
-    if (option === currentQuestion.correctAnswer) return 'default'
+    if (option === currentQuestion.correctAnswer) return 'success'
     if (option === selectedOption) return 'destructive'
     return 'outline'
   }
@@ -80,6 +80,8 @@ export function GameClient({ questions, sessionId, categoryId, difficulty }: Gam
               variant={getOptionVariant(option)}
               className="w-full justify-start"
               onClick={() => handleSelect(option)}
+              disabled={isAnswered}
+              size="lg"
             >
               {option}
             </Button>
