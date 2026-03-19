@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { Background } from "@/components/background";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
@@ -28,8 +29,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("dark font-sans", inter.variable)}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}
       >
+        <div className="fixed inset-0 -z-10">
+          <Background />
+        </div>
         {children}
       </body>
     </html>
