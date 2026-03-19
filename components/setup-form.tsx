@@ -68,7 +68,7 @@ export function SetupForm({ categories, action }: SetupFormProps) {
           />
 
           <div className="space-y-2">
-            <Label>Category</Label>
+            <Label className="text-lg">Category</Label>
             {isHydrated ? (
               <Combobox
                 items={categoryOptions}
@@ -117,7 +117,7 @@ export function SetupForm({ categories, action }: SetupFormProps) {
           </div>
 
           <div className="space-y-3">
-            <Label>Difficulty</Label>
+            <Label className="text-lg">Difficulty</Label>
             <RadioGroup
               name="difficulty"
               defaultValue="easy"
@@ -137,7 +137,7 @@ export function SetupForm({ categories, action }: SetupFormProps) {
           <Button
             type="submit"
             disabled={!selectedCategory}
-            className="w-full bg-black"
+            className="w-full"
           >
             Play!
           </Button>

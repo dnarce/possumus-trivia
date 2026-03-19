@@ -57,11 +57,11 @@ export function ResultClient({
           <form action={restartAction}>
             <input type="hidden" name="categoryId" value={categoryId} />
             <input type="hidden" name="difficulty" value={difficulty} />
-            <Button type="submit" className="w-full">
+            <Button variant="outline" type="submit" className="w-full">
               Restart
             </Button>
           </form>
-          <Button className="w-full" variant="outline" asChild>
+          <Button className="w-full" variant="ghost" asChild>
             <Link href="/">Exit</Link>
           </Button>
         </div>

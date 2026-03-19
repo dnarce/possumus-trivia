@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { GameClient } from '@/components/game-client'
 import type { Question } from '@/types/trivia'
 
@@ -34,6 +34,7 @@ const defaultProps = {
 beforeEach(() => {
   mockPush.mockClear()
   sessionStorage.clear()
+  vi.useRealTimers()
 })
 
 describe('GameClient', () => {
@@ -44,7 +45,14 @@ describe('GameClient', () => {
 
   it('displays the question counter', () => {
     render(<GameClient {...defaultProps} />)
-    expect(screen.getByText('Question 1 of 2')).toBeInTheDocument()
+    expect(screen.getByText('Question 1/2')).toBeInTheDocument()
+  })
+
+  it('displays the category, difficulty and initial score in the header', () => {
+    render(<GameClient {...defaultProps} />)
+    expect(screen.getByText('General Knowledge')).toBeInTheDocument()
+    expect(screen.getByText('Medium')).toBeInTheDocument()
+    expect(screen.getByText('Score 0 pts')).toBeInTheDocument()
   })
 
   it('Next button is disabled before answering', () => {
@@ -56,15 +64,19 @@ describe('GameClient', () => {
     render(<GameClient {...defaultProps} />)
     fireEvent.click(screen.getByRole('button', { name: 'Paris' }))
     expect(screen.getByRole('button', { name: 'Next' })).not.toBeDisabled()
+    expect(screen.getByText('Score 20 pts')).toBeInTheDocument()
   })
 
-  it('does not allow changing the answer once selected', () => {
+  it('does not allow changing the answer once selected', async () => {
+    vi.useFakeTimers()
     render(<GameClient {...defaultProps} />)
     fireEvent.click(screen.getByRole('button', { name: 'Madrid' }))  // incorrect, first click
     fireEvent.click(screen.getByRole('button', { name: 'Paris' }))   // attempt to change
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
     fireEvent.click(screen.getByRole('button', { name: '4' }))       // correct
-    fireEvent.click(screen.getByRole('button', { name: 'See results' }))
+    await act(async () => {
+      vi.advanceTimersByTime(1000)
+    })
 
     const stored = JSON.parse(sessionStorage.getItem('game-session-abc')!)
     expect(stored.answers[0].selectedOption).toBe('Madrid')
@@ -77,33 +89,46 @@ describe('GameClient', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Paris' }))
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
     expect(screen.getByText('How much is 2 + 2?')).toBeInTheDocument()
-    expect(screen.getByText('Question 2 of 2')).toBeInTheDocument()
+    expect(screen.getByText('Question 2/2')).toBeInTheDocument()
   })
 
-  it('shows "See results" on the last question', () => {
+  it('auto-finishes after answering the last question', async () => {
+    vi.useFakeTimers()
     render(<GameClient {...defaultProps} />)
     fireEvent.click(screen.getByRole('button', { name: 'Paris' }))
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
-    expect(screen.getByRole('button', { name: 'See results' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '4' }))
+    await act(async () => {
+      vi.advanceTimersByTime(1000)
+    })
+    expect(mockPush).toHaveBeenCalledWith(
+      '/game/session-abc/result?categoryId=9&difficulty=medium'
+    )
   })
 
-  it('saves the correct score in sessionStorage when finished', () => {
+  it('saves the correct score in sessionStorage when finished', async () => {
+    vi.useFakeTimers()
     render(<GameClient {...defaultProps} />)
     fireEvent.click(screen.getByRole('button', { name: 'Paris' }))  // correct
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
     fireEvent.click(screen.getByRole('button', { name: '3' }))      // incorrect
-    fireEvent.click(screen.getByRole('button', { name: 'See results' }))
+    await act(async () => {
+      vi.advanceTimersByTime(1000)
+    })
 
     const stored = JSON.parse(sessionStorage.getItem('game-session-abc')!)
     expect(stored.score).toBe(20) // 1 correct × 20
   })
 
-  it('redirects to result with correct params when finished', () => {
+  it('redirects to result with correct params when finished', async () => {
+    vi.useFakeTimers()
     render(<GameClient {...defaultProps} />)
     fireEvent.click(screen.getByRole('button', { name: 'Paris' }))
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
     fireEvent.click(screen.getByRole('button', { name: '4' }))
-    fireEvent.click(screen.getByRole('button', { name: 'See results' }))
+    await act(async () => {
+      vi.advanceTimersByTime(1000)
+    })
 
     expect(mockPush).toHaveBeenCalledWith(
       '/game/session-abc/result?categoryId=9&difficulty=medium'

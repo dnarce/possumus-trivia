@@ -1,11 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { createElement, useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CheckCircle2, XCircle } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import type { Question, PlayerAnswer } from '@/types/trivia'
+import { getCategoryIcon, getCategoryLabel } from '@/lib/category-icons'
 import { GlassCard } from './ui/glass-card'
 
 const POINTS_PER_CORRECT = 20
@@ -26,6 +27,11 @@ export function GameClient({ questions, sessionId, categoryId, difficulty }: Gam
   const currentQuestion = questions[currentIndex]
   const isAnswered = selectedOption !== null
   const isLastQuestion = currentIndex === questions.length - 1
+  const categoryLabel = getCategoryLabel(categoryId)
+  const difficultyLabel = difficulty.charAt(0).toUpperCase() + difficulty.slice(1)
+  const score =
+    answers.filter((answer) => answer.isCorrect).length * POINTS_PER_CORRECT +
+    (selectedOption === currentQuestion.correctAnswer ? POINTS_PER_CORRECT : 0)
 
   function handleSelect(option: string) {
     if (isAnswered) return
@@ -59,23 +65,39 @@ export function GameClient({ questions, sessionId, categoryId, difficulty }: Gam
     return () => clearTimeout(timer)
   }, [isLastQuestion, selectedOption, handleNext])
 
-  function getOptionVariant(option: string): 'outline' | 'success' | 'destructive' {
-    if (!isAnswered) return 'outline'
+  function getOptionVariant(option: string): 'default' | 'success' | 'destructive' {
+    if (!isAnswered) return 'default'
     if (option === currentQuestion.correctAnswer) return 'success'
     if (option === selectedOption) return 'destructive'
-    return 'outline'
+    return 'default'
   }
 
   return (
-    <div className="space-y-6">
-      <p className="text-sm">
-        Question {currentIndex + 1} of {questions.length}
-      </p>
+    <div className="flex flex-col justify-between h-full py-16">
+      <div className="grid gap-3 text-sm sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+        <div className="flex flex-wrap items-center gap-2 sm:justify-self-start">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 backdrop-blur-sm px-3 py-1.5 shadow-sm">
+            {createElement(getCategoryIcon(categoryId), { className: 'size-4' })}
+            <span>{categoryLabel}</span>
+          </div>
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 backdrop-blur-sm px-3 py-1.5 shadow-sm">
+            {difficultyLabel}
+          </div>
+        </div>
+
+        <p className="text-center font-medium sm:justify-self-center">
+          Question {currentIndex + 1}/{questions.length}
+        </p>
+
+        <p className="text-center font-medium sm:justify-self-end">
+          Score {score} pts
+        </p>
+      </div>
+
       <h2 className="text-6xl text-shadow-lg font-bold tracking-tight text-center">{currentQuestion.text}</h2>
 
-      <GlassCard className="px-8 py-12">
-        <CardContent className="space-y-3">
-          {currentQuestion.options.map((option) => (
+      <div className="px-8 py-12 space-y-3">
+      {currentQuestion.options.map((option) => (
             <Button
               key={option}
               variant={getOptionVariant(option)}
@@ -92,11 +114,10 @@ export function GameClient({ questions, sessionId, categoryId, difficulty }: Gam
               {option}
             </Button>
           ))}
-        </CardContent>
-      </GlassCard>
+      </div>
 
       {!isLastQuestion && (
-        <Button className="w-full" disabled={!isAnswered} onClick={handleNext}>
+        <Button className="w-full" variant="outline" disabled={!isAnswered} onClick={handleNext}>
           Next
         </Button>
       )}
