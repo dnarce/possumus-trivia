@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import type { Question, PlayerAnswer } from '@/types/trivia'
+import { GlassCard } from './ui/glass-card'
 
 const POINTS_PER_CORRECT = 20
 
@@ -66,14 +67,12 @@ export function GameClient({ questions, sessionId, categoryId, difficulty }: Gam
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm">
         Question {currentIndex + 1} of {questions.length}
       </p>
+      <h2 className="text-6xl text-shadow-lg font-bold tracking-tight text-center">{currentQuestion.text}</h2>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg leading-snug">{currentQuestion.text}</CardTitle>
-        </CardHeader>
+      <GlassCard className="p-8">
         <CardContent className="space-y-3">
           {currentQuestion.options.map((option) => (
             <Button
@@ -86,7 +85,7 @@ export function GameClient({ questions, sessionId, categoryId, difficulty }: Gam
             </Button>
           ))}
         </CardContent>
-      </Card>
+      </GlassCard>
 
       {!isLastQuestion && (
         <Button className="w-full" disabled={!isAnswered} onClick={handleNext}>

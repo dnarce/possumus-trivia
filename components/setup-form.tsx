@@ -12,8 +12,9 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { CardContent } from "@/components/ui/card";
+import { GlassCard } from "@/components/ui/glass-card";
 import type { Category } from "@/types/trivia";
-import { Card, CardContent } from "./ui/card";
 
 interface SetupFormProps {
   categories: Category[];
@@ -30,7 +31,7 @@ export function SetupForm({ categories, action }: SetupFormProps) {
   const [categoryId, setCategoryId] = useState("");
 
   return (
-    <Card>
+    <GlassCard>
       <CardContent className="space-y-3 p-8">
         <form action={action} className="space-y-6">
           <input type="hidden" name="categoryId" value={categoryId} />
@@ -71,11 +72,11 @@ export function SetupForm({ categories, action }: SetupFormProps) {
             </RadioGroup>
           </div>
 
-          <Button type="submit" disabled={!categoryId} className="w-full">
+          <Button type="submit" disabled={!categoryId} className="w-full bg-black">
             Play!
           </Button>
         </form>
       </CardContent>
-    </Card>
+    </GlassCard>
   );
 }
