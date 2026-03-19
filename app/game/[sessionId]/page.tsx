@@ -29,7 +29,7 @@ export default async function GamePage({ params, searchParams }: GamePageProps) 
 
   return (
     <main className="flex min-h-screen items-center justify-center">
-      <div className="w-full max-w-3xl px-4">
+      <div className="w-full max-w-4xl px-4">
         <GameClient questions={questions} sessionId={sessionId} categoryId={Number(categoryId)} difficulty={difficulty} />
       </div>
     </main>

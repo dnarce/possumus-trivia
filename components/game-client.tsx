@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { CheckCircle2, XCircle } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import type { Question, PlayerAnswer } from '@/types/trivia'
@@ -72,17 +73,22 @@ export function GameClient({ questions, sessionId, categoryId, difficulty }: Gam
       </p>
       <h2 className="text-6xl text-shadow-lg font-bold tracking-tight text-center">{currentQuestion.text}</h2>
 
-      <GlassCard className="p-8">
+      <GlassCard className="px-8 py-12">
         <CardContent className="space-y-3">
           {currentQuestion.options.map((option) => (
             <Button
               key={option}
               variant={getOptionVariant(option)}
-              className="w-full justify-start"
+              className="w-full justify-start gap-2"
               onClick={() => handleSelect(option)}
               disabled={isAnswered}
               size="lg"
             >
+              {isAnswered && option === currentQuestion.correctAnswer ? (
+                <CheckCircle2 className="h-5 w-5" />
+              ) : isAnswered && option === selectedOption ? (
+                <XCircle className="h-5 w-5" />
+              ) : null}
               {option}
             </Button>
           ))}
