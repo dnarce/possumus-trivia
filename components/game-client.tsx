@@ -79,7 +79,7 @@ export function GameClient({ questions, sessionId, categoryId, difficulty }: Gam
             <Button
               key={option}
               variant={getOptionVariant(option)}
-              className="w-full justify-start gap-2"
+              className="w-full justify-center gap-2"
               onClick={() => handleSelect(option)}
               disabled={isAnswered}
               size="lg"

@@ -1,0 +1,90 @@
+import type { LucideIcon } from 'lucide-react'
+import {
+  BookImage,
+  BookOpen,
+  Brain,
+  CarFront,
+  Clapperboard,
+  Dices,
+  Drama,
+  Gamepad2,
+  Globe2,
+  Landmark,
+  LaptopMinimal,
+  Music,
+  Palette,
+  PanelsTopLeft,
+  PawPrint,
+  Star,
+  Trophy,
+  Tv,
+  WandSparkles,
+  Atom,
+  Sigma,
+  ScrollText,
+  Smartphone,
+  MonitorPlay,
+  BadgeQuestionMark,
+} from 'lucide-react'
+
+export const TRIVIA_CATEGORY_IDS = [
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  25,
+  26,
+  27,
+  28,
+  29,
+  30,
+  31,
+  32,
+] as const
+
+export type TriviaCategoryId = (typeof TRIVIA_CATEGORY_IDS)[number]
+
+export const DEFAULT_CATEGORY_ICON = BadgeQuestionMark
+
+export const CATEGORY_ICON_MAP: Record<TriviaCategoryId, LucideIcon> = {
+  9: Brain,
+  10: BookOpen,
+  11: Clapperboard,
+  12: Music,
+  13: Drama,
+  14: Tv,
+  15: Gamepad2,
+  16: Dices,
+  17: Atom,
+  18: LaptopMinimal,
+  19: Sigma,
+  20: WandSparkles,
+  21: Trophy,
+  22: Globe2,
+  23: ScrollText,
+  24: Landmark,
+  25: Palette,
+  26: Star,
+  27: PawPrint,
+  28: CarFront,
+  29: PanelsTopLeft,
+  30: Smartphone,
+  31: BookImage,
+  32: MonitorPlay,
+}
+
+export function getCategoryIcon(categoryId: number): LucideIcon {
+  return CATEGORY_ICON_MAP[categoryId as TriviaCategoryId] ?? DEFAULT_CATEGORY_ICON
+}
