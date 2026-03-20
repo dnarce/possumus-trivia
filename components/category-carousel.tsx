@@ -24,7 +24,23 @@ export function CategoryCarousel({
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center" });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const tweenNodes = useRef<HTMLElement[]>([]);
+  const lastNotifiedIndex = useRef<number | null>(null);
   const groupName = useId();
+
+  const commitSelection = useCallback(
+    (index: number) => {
+      setSelectedIndex(index);
+
+      if (lastNotifiedIndex.current === index) return;
+
+      lastNotifiedIndex.current = index;
+      const category = categories[index];
+      if (category) {
+        onSelect?.(category);
+      }
+    },
+    [categories, onSelect]
+  );
 
   const setTweenNodes = useCallback(() => {
     if (!emblaApi) return;
@@ -50,8 +66,8 @@ export function CategoryCarousel({
 
   const updateSelectedIndex = useCallback(() => {
     if (!emblaApi) return;
-    setSelectedIndex(emblaApi.selectedScrollSnap());
-  }, [emblaApi]);
+    commitSelection(emblaApi.selectedScrollSnap());
+  }, [commitSelection, emblaApi]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -75,20 +91,12 @@ export function CategoryCarousel({
     };
   }, [emblaApi, setTweenNodes, applyScale, updateSelectedIndex]);
 
-  useEffect(() => {
-    const category = categories[selectedIndex];
-
-    if (category) {
-      onSelect?.(category);
-    }
-  }, [categories, onSelect, selectedIndex]);
-
   const selectCategory = useCallback(
     (index: number) => {
+      commitSelection(index);
       emblaApi?.scrollTo(index);
-      setSelectedIndex(index);
     },
-    [emblaApi]
+    [commitSelection, emblaApi]
   );
 
   return (

@@ -96,12 +96,14 @@ describe('CategoryCarousel', () => {
     expect(screen.getByText('Unknown')).toBeInTheDocument()
   })
 
-  it('calls onSelect with the first category on mount', () => {
+  it('calls onSelect when the user selects a category', () => {
     const onSelect = vi.fn()
     render(<CategoryCarousel categories={MOCK_CATEGORIES} onSelect={onSelect} />)
 
+    screen.getAllByRole('radio')[1].click()
+
     expect(onSelect).toHaveBeenCalledOnce()
-    expect(onSelect).toHaveBeenCalledWith(MOCK_CATEGORIES[0])
+    expect(onSelect).toHaveBeenCalledWith(MOCK_CATEGORIES[1])
   })
 
   it('does not throw when onSelect is not provided', () => {
