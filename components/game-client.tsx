@@ -61,7 +61,7 @@ export function GameClient({
         updatedAnswers.filter((a) => a.isCorrect).length * POINTS_PER_CORRECT;
       sessionStorage.setItem(
         `game-${sessionId}`,
-        JSON.stringify({ answers: updatedAnswers, score }),
+        JSON.stringify({ answers: updatedAnswers, score, questions }),
       );
       router.push(
         `/game/${sessionId}/result?categoryId=${categoryId}&difficulty=${difficulty}`,
