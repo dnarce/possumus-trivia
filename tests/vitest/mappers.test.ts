@@ -59,4 +59,11 @@ describe('mapQuestion', () => {
     const result = mapQuestion(mockRawQuestion, 0)
     expect(result.options).toHaveLength(4)
   })
+
+  it('uses a Fisher-Yates shuffle with an injectable random source', () => {
+    const randomValues = [0.75, 0.25, 0.5]
+    const result = mapQuestion(mockRawQuestion, 0, () => randomValues.shift() ?? 0)
+
+    expect(result.options).toEqual(['3', '2', '1', '4'])
+  })
 })
