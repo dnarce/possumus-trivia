@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:test": "OPENTDB_BASE_URL=http://localhost:3000/api/mock-opentdb next dev",
+    "dev:test": "OPENTDB_BASE_URL=http://localhost:3001/api/mock-opentdb next dev -p 3001",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

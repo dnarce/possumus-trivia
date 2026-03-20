@@ -10,6 +10,10 @@ async function startGame(page: Page) {
   await page.getByLabel('Easy').click()
   await page.getByRole('button', { name: 'Play!' }).click()
   await page.waitForURL('**/game/**')
+  // Wait for the game content to finish streaming from the server component.
+  // The Next button is the last element rendered — if it's present, everything
+  // else (question counter, question text, answer buttons) is also in the DOM.
+  await page.getByRole('button', { name: 'Next', exact: true }).waitFor()
 }
 
 async function completeGame(page: Page, answers: string[]) {
@@ -17,9 +21,11 @@ async function completeGame(page: Page, answers: string[]) {
     await page.getByRole('button', { name: answers[i] }).click()
     await page.getByRole('button', { name: 'Next', exact: true }).click()
   }
+  // Last question: select answer, then 1-second timer auto-advances
   await page.getByRole('button', { name: answers[answers.length - 1] }).click()
-  await page.getByRole('button', { name: 'See results' }).click()
   await page.waitForURL('**/result**')
+  // Wait for result content — sessionStorage read + render is async on the client
+  await page.getByRole('button', { name: 'Restart' }).waitFor()
 }
 
 test.describe('Trivia game flow', () => {
@@ -45,7 +51,7 @@ test.describe('Trivia game flow', () => {
   test('shows first question and answer options', async ({ page }) => {
     await startGame(page)
 
-    await expect(page.getByText('Question 1 of 5')).toBeVisible()
+    await expect(page.getByText('Question 1/5')).toBeVisible()
     await expect(page.getByText('What is the capital of France?')).toBeVisible()
     await expect(page.getByRole('button', { name: 'Paris' })).toBeVisible()
   })
@@ -69,11 +75,11 @@ test.describe('Trivia game flow', () => {
     await page.getByRole('button', { name: 'Paris' }).click()
     await page.getByRole('button', { name: 'Next', exact: true }).click()
 
-    await expect(page.getByText('Question 2 of 5')).toBeVisible()
+    await expect(page.getByText('Question 2/5')).toBeVisible()
     await expect(page.getByText('How much is 2 + 2?')).toBeVisible()
   })
 
-  test('shows "See results" on the last question', async ({ page }) => {
+  test('Next button is hidden on the last question', async ({ page }) => {
     await startGame(page)
 
     for (let i = 0; i < CORRECT_ANSWERS.length - 1; i++) {
@@ -81,7 +87,7 @@ test.describe('Trivia game flow', () => {
       await page.getByRole('button', { name: 'Next', exact: true }).click()
     }
 
-    await expect(page.getByRole('button', { name: 'See results' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Next', exact: true })).not.toBeVisible()
   })
 
   test('redirects to result page after finishing the game', async ({ page }) => {
@@ -123,6 +129,6 @@ test.describe('Trivia game flow', () => {
     await page.getByRole('link', { name: 'Exit' }).click()
 
     await page.waitForURL('/')
-    expect(page.url()).toBe('http://localhost:3000/')
+    expect(page.url()).toBe('http://localhost:3001/')
   })
 })
