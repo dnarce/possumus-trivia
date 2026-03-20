@@ -71,8 +71,21 @@ export function CategoryCarousel({ categories, onSelect }: CategoryCarouselProps
     };
   }, [emblaApi, setTweenNodes, applyScale, handleSelect]);
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "ArrowLeft") emblaApi?.scrollPrev();
+      else if (e.key === "ArrowRight") emblaApi?.scrollNext();
+    },
+    [emblaApi]
+  );
+
   return (
-    <div className="overflow-hidden" ref={emblaRef}>
+    <div
+      className="overflow-hidden outline-none"
+      ref={emblaRef}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+    >
       <div className="flex touch-pan-y">
         {categories.map((category, index) => {
           const CategoryIcon = getCategoryIcon(category.id);
