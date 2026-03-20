@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import useEmblaCarousel from "embla-carousel-react";
 import { CATEGORY_IMAGE_MAP, CATEGORY_LABEL_MAP, getCategoryIcon } from "@/lib/category-icons";
 import type { Category } from "@/types/trivia";
@@ -41,35 +42,40 @@ export function CategoryCarousel({ categories, onSelect }: CategoryCarouselProps
     });
   }, [emblaApi]);
 
-  const handleSelect = useCallback(() => {
+  const updateSelectedIndex = useCallback(() => {
     if (!emblaApi) return;
-    const index = emblaApi.selectedScrollSnap();
-    setSelectedIndex(index);
-    onSelect?.(categories[index]);
-  }, [emblaApi, categories, onSelect]);
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
 
   useEffect(() => {
     if (!emblaApi) return;
     setTweenNodes();
     applyScale();
-    handleSelect();
 
     emblaApi
       .on("reInit", setTweenNodes)
       .on("reInit", applyScale)
-      .on("reInit", handleSelect)
+      .on("reInit", updateSelectedIndex)
       .on("scroll", applyScale)
-      .on("select", handleSelect);
+      .on("select", updateSelectedIndex);
 
     return () => {
       emblaApi
         .off("reInit", setTweenNodes)
         .off("reInit", applyScale)
-        .off("reInit", handleSelect)
+        .off("reInit", updateSelectedIndex)
         .off("scroll", applyScale)
-        .off("select", handleSelect);
+        .off("select", updateSelectedIndex);
     };
-  }, [emblaApi, setTweenNodes, applyScale, handleSelect]);
+  }, [emblaApi, setTweenNodes, applyScale, updateSelectedIndex]);
+
+  useEffect(() => {
+    const category = categories[selectedIndex];
+
+    if (category) {
+      onSelect?.(category);
+    }
+  }, [categories, onSelect, selectedIndex]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -109,9 +115,11 @@ export function CategoryCarousel({ categories, onSelect }: CategoryCarouselProps
                     isSelected ? "border-primary shadow-lg shadow-primary/20" : "border-white/10"
                   }`}
                 >
-                  <img
+                  <Image
                     src={imageSrc ?? CATEGORY_IMAGE_MAP[9]} // fallback to general knowledge
                     alt={label}
+                    width={470}
+                    height={660}
                     className="w-full h-full max-h-[450px] aspect-47/66 object-cover"
                     draggable={false}
                   />

@@ -56,14 +56,14 @@ describe('CategoryCarousel', () => {
     render(<CategoryCarousel categories={MOCK_CATEGORIES} />)
 
     const img = screen.getByAltText('General Knowledge') as HTMLImageElement
-    expect(img.src).toContain(CATEGORY_IMAGE_MAP[9])
+    expect(decodeURIComponent(img.src)).toContain(CATEGORY_IMAGE_MAP[9])
   })
 
   it('falls back to the General Knowledge image for unknown categories', () => {
     render(<CategoryCarousel categories={[UNKNOWN_CATEGORY]} />)
 
     const img = screen.getByAltText('Unknown') as HTMLImageElement
-    expect(img.src).toContain(CATEGORY_IMAGE_MAP[9])
+    expect(decodeURIComponent(img.src)).toContain(CATEGORY_IMAGE_MAP[9])
   })
 
   it('uses the mapped label when one exists', () => {
