@@ -124,7 +124,7 @@ export function GameClient({
       <SplitText
         key={currentIndex}
         text={currentQuestion.text}
-        className="text-6xl text-shadow-lg font-bold tracking-tight text-center py-10"
+        className="text-3xl sm:text-6xl text-shadow-lg font-bold tracking-tight text-center py-6 sm:py-10"
         delay={25}
         duration={0.5}
         ease="power3.out"
@@ -136,15 +136,15 @@ export function GameClient({
         textAlign="center"
       />
 
-      <div className="px-8 py-12 space-y-3">
+      <div className="px-4 sm:px-8 py-4 sm:py-6 space-y-2 sm:space-y-2.5">
         {currentQuestion.options.map((option) => (
           <Button
             key={option}
             variant={getOptionVariant(option)}
-            className="w-full justify-center gap-2"
+            className="w-full justify-center gap-2 sm:h-12 sm:px-4 sm:text-lg sm:font-semibold"
             onClick={() => handleSelect(option)}
             disabled={isAnswered}
-            size="lg"
+            size="default"
           >
             {isAnswered && option === currentQuestion.correctAnswer ? (
               <CheckCircle2 className="h-5 w-5" />
