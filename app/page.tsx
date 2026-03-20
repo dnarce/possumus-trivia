@@ -9,6 +9,10 @@ interface SetupPageProps {
 }
 
 const SETUP_ERROR_MESSAGES: Record<string, { title: string; description: string }> = {
+  config: {
+    title: 'Invalid game configuration',
+    description: 'The selected category or difficulty is not valid. Please choose them again.',
+  },
   session: {
     title: 'Could not start the game',
     description: 'Could not create a trivia session. Please try again.',

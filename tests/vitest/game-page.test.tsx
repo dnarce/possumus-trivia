@@ -44,4 +44,16 @@ describe('GamePage', () => {
 
     expect(screen.getByText('Not enough questions')).toBeInTheDocument()
   })
+
+  it('shows a controlled error when category or difficulty are outside the allowed domain', async () => {
+    render(
+      await GamePage({
+        params: Promise.resolve({ sessionId: 'session-abc' }),
+        searchParams: Promise.resolve({ categoryId: '999', difficulty: 'legendary' }),
+      })
+    )
+
+    expect(screen.getByText('Invalid game configuration')).toBeInTheDocument()
+    expect(vi.mocked(fetchQuestions)).not.toHaveBeenCalled()
+  })
 })

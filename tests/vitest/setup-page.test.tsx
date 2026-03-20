@@ -35,4 +35,15 @@ describe('SetupPage', () => {
     expect(screen.getByText('Could not start the game')).toBeInTheDocument()
     expect(screen.getByText('Could not create a trivia session. Please try again.')).toBeInTheDocument()
   })
+
+  it('shows a controlled error modal when the submitted config is invalid', async () => {
+    vi.mocked(fetchCategories).mockResolvedValue({
+      trivia_categories: [{ id: 9, name: 'General Knowledge' }],
+    })
+
+    render(await SetupPage({ searchParams: Promise.resolve({ error: 'config' }) }))
+
+    expect(screen.getByText('Invalid game configuration')).toBeInTheDocument()
+    expect(screen.getByText('The selected category or difficulty is not valid. Please choose them again.')).toBeInTheDocument()
+  })
 })
