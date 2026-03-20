@@ -147,6 +147,7 @@ export function ResultClient({
     <div className="space-y-6">
       {/* Score summary */}
       <div className="space-y-2 text-center">
+        <h1 className="sr-only">Game Results — {result.score} points</h1>
         <Image
           src={scoreImage}
           alt="score result"

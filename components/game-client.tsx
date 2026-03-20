@@ -135,6 +135,7 @@ export function GameClient({
       <SplitText
         key={currentIndex}
         text={currentQuestion.text}
+        tag="h1"
         className="text-3xl sm:text-6xl text-shadow-lg font-bold tracking-tight text-center py-6 sm:py-10"
         delay={25}
         duration={0.5}

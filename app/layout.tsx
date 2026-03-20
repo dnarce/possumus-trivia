@@ -19,6 +19,32 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Trivia Game",
   description: "Test your knowledge across dozens of categories. Answer questions, challenge yourself, and see how you rank!",
+  openGraph: {
+    title: "Trivia Game",
+    description: "Test your knowledge across dozens of categories. Answer questions, challenge yourself, and see how you rank!",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Trivia Game",
+    description: "Test your knowledge across dozens of categories. Answer questions, challenge yourself, and see how you rank!",
+  },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Trivia Game",
+  description:
+    "Test your knowledge across dozens of categories. Answer questions, challenge yourself, and see how you rank!",
+  applicationCategory: "GameApplication",
+  operatingSystem: "Any",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
 };
 
 export default function RootLayout({
@@ -28,6 +54,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={cn("dark font-sans", inter.variable)}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}
       >
