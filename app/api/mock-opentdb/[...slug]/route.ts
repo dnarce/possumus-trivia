@@ -60,7 +60,7 @@ export function GET(request: NextRequest) {
     return new Response('Not found', { status: 404 })
   }
 
-  const { pathname } = new URL(request.url)
+  const { pathname, searchParams } = new URL(request.url)
 
   if (pathname.includes('api_token.php')) {
     return Response.json({ response_code: 0, token: MOCK_TOKEN })
@@ -71,6 +71,11 @@ export function GET(request: NextRequest) {
   }
 
   if (pathname.includes('api.php')) {
+    // Pass ?simulateCode=1 (no results) or ?simulateCode=4 (token empty) to test error states
+    const simulateCode = searchParams.get('simulateCode')
+    if (simulateCode) {
+      return Response.json({ response_code: Number(simulateCode), results: [] })
+    }
     return Response.json(MOCK_QUESTIONS)
   }
 

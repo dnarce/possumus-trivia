@@ -137,7 +137,7 @@ export function GameClient({
       />
 
       <div className="flex flex-col gap-3">
-        <div className="px-4 sm:px-8 space-y-2 sm:space-y-2.5">
+        <div className="px-4 sm:px-8 space-y-2 sm:space-y-2.5 pb-4 sm:pb-6">
           {currentQuestion.options.map((option) => (
             <Button
               key={option}

@@ -1,13 +1,38 @@
-import { redirect } from 'next/navigation'
-import { fetchQuestions } from '@/lib/opentdb'
+import { fetchQuestions, resetSession } from '@/lib/opentdb'
 import { mapQuestion } from '@/lib/mappers'
 import { GameClient } from '@/components/game-client'
+import { ErrorModal } from '@/components/error-modal'
 import type { TriviaConfig } from '@/types/trivia'
 import { TRIVIA_DEFAULTS } from '@/types/trivia'
 
 interface GamePageProps {
   params: Promise<{ sessionId: string }>
   searchParams: Promise<{ categoryId: string; difficulty: string }>
+}
+
+const ERROR_MESSAGES: Partial<Record<number, { title: string; description: string }>> = {
+  1: {
+    title: 'Not enough questions',
+    description: "There aren't enough questions available for this category and difficulty. Try a different combination.",
+  },
+  4: {
+    title: 'Questions exhausted',
+    description: "You've gone through all available questions for this combination. Try a different category or difficulty.",
+  },
+}
+
+const GENERIC_ERROR = {
+  title: 'Something went wrong',
+  description: 'Could not load questions. Please try again.',
+}
+
+function ErrorPage({ code }: { code: number }) {
+  const { title, description } = ERROR_MESSAGES[code] ?? GENERIC_ERROR
+  return (
+    <main className="flex h-dvh items-center justify-center">
+      <ErrorModal title={title} description={description} />
+    </main>
+  )
 }
 
 export default async function GamePage({ params, searchParams }: GamePageProps) {
@@ -21,9 +46,17 @@ export default async function GamePage({ params, searchParams }: GamePageProps) 
     difficulty: difficulty as TriviaConfig['difficulty'],
   }
 
-  const raw = await fetchQuestions(sessionId, config)
+  let raw = await fetchQuestions(sessionId, config)
 
-  if (raw.response_code !== 0) redirect('/')
+  // Token exhausted — reset and retry once
+  if (raw.response_code === 4) {
+    await resetSession(sessionId)
+    raw = await fetchQuestions(sessionId, config)
+  }
+
+  if (raw.response_code !== 0) {
+    return <ErrorPage code={raw.response_code} />
+  }
 
   const questions = raw.results.map((q, i) => mapQuestion(q, i))
 

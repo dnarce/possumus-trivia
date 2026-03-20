@@ -19,6 +19,10 @@ export async function fetchCategories(): Promise<OpenTDBCategoriesResponse> {
   return res.json()
 }
 
+export async function resetSession(token: string): Promise<void> {
+  await fetch(`${BASE_URL}/api_token.php?command=reset&token=${token}`)
+}
+
 export async function fetchQuestions(sessionId: string, config: TriviaConfig): Promise<OpenTDBQuestionsResponse> {
   const { amount = TRIVIA_DEFAULTS.amount, type = TRIVIA_DEFAULTS.type } = config
   const params = new URLSearchParams({
