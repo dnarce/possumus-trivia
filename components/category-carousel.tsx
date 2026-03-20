@@ -101,7 +101,7 @@ export function CategoryCarousel({ categories, onSelect }: CategoryCarouselProps
             >
               <div
                 data-scale
-                className="transition-transform duration-200 will-change-transform"
+                className="will-change-transform"
                 style={{ transformOrigin: "center center" }}
               >
                 <div
