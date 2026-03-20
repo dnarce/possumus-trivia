@@ -1,3 +1,4 @@
+import type { ComponentProps } from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { GameClient } from '@/components/game-client'
@@ -35,11 +36,12 @@ const defaultProps = {
   sessionId: 'session-abc',
   categoryId: 9,
   difficulty: 'medium',
-}
+} satisfies ComponentProps<typeof GameClient>
 
 beforeEach(() => {
   mockPush.mockClear()
   sessionStorage.clear()
+  localStorage.clear()
   vi.useRealTimers()
 })
 
@@ -123,7 +125,9 @@ describe('GameClient', () => {
     })
 
     const stored = JSON.parse(sessionStorage.getItem('game-session-abc')!)
+    const durableStored = JSON.parse(localStorage.getItem('game-session-abc')!)
     expect(stored.score).toBe(20) // 1 correct × 20
+    expect(durableStored.score).toBe(20)
   })
 
   it('redirects to result with correct params when finished', async () => {

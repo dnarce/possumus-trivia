@@ -3,11 +3,10 @@
 import { createElement, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, XCircle } from "lucide-react";
-import { CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import type { Question, PlayerAnswer } from "@/types/trivia";
+import type { Question, PlayerAnswer, TriviaConfig } from "@/types/trivia";
 import { getCategoryIcon, getCategoryLabel } from "@/lib/category-icons";
-import { GlassCard } from "./ui/glass-card";
+import { clearGameResult, persistGameResult } from "@/lib/game-result-storage";
 import SplitText from "./SplitText";
 
 const POINTS_PER_CORRECT = 20;
@@ -16,7 +15,7 @@ interface GameClientProps {
   questions: Question[];
   sessionId: string;
   categoryId: number;
-  difficulty: string;
+  difficulty: TriviaConfig["difficulty"];
 }
 
 export function GameClient({
@@ -40,6 +39,10 @@ export function GameClient({
     answers.filter((answer) => answer.isCorrect).length * POINTS_PER_CORRECT +
     (selectedOption === currentQuestion.correctAnswer ? POINTS_PER_CORRECT : 0);
 
+  useEffect(() => {
+    clearGameResult(sessionId);
+  }, [sessionId]);
+
   function handleSelect(option: string) {
     if (isAnswered) return;
     setSelectedOption(option);
@@ -59,10 +62,13 @@ export function GameClient({
     if (isLastQuestion) {
       const score =
         updatedAnswers.filter((a) => a.isCorrect).length * POINTS_PER_CORRECT;
-      sessionStorage.setItem(
-        `game-${sessionId}`,
-        JSON.stringify({ answers: updatedAnswers, score, questions }),
-      );
+      persistGameResult(sessionId, {
+        answers: updatedAnswers,
+        score,
+        questions,
+        categoryId,
+        difficulty,
+      });
       router.push(
         `/game/${sessionId}/result?categoryId=${categoryId}&difficulty=${difficulty}`,
       );
@@ -77,6 +83,7 @@ export function GameClient({
     currentQuestion,
     difficulty,
     isLastQuestion,
+    questions,
     router,
     selectedOption,
     sessionId,

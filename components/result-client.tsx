@@ -1,6 +1,6 @@
 "use client";
 
-import { createElement, useCallback, useEffect, useState } from "react";
+import { createElement, useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, XCircle } from "lucide-react";
@@ -13,21 +13,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { PlayerAnswer, Question } from "@/types/trivia";
-import { GlassCard } from "./ui/glass-card";
+import {
+  deserializeGameResult,
+  readGameResultSnapshot,
+} from "@/lib/game-result-storage";
 import { getCategoryIcon, getCategoryLabel } from "@/lib/category-icons";
-
-interface GameResult {
-  answers: PlayerAnswer[];
-  score: number;
-  questions: Question[];
-}
+import type { PlayerAnswer, Question } from "@/types/trivia";
 
 interface ResultClientProps {
   sessionId: string;
   categoryId: string;
   difficulty: string;
   restartAction: (formData: FormData) => void;
+}
+
+function subscribeToStorage() {
+  return () => {};
 }
 
 function ReviewDialog({
@@ -99,24 +100,32 @@ export function ResultClient({
   restartAction,
 }: ResultClientProps) {
   const router = useRouter();
-  const [result, setResult] = useState<GameResult | null>(null);
-
-  const loadResult = useCallback(() => {
-    const stored = sessionStorage.getItem(`game-${sessionId}`);
-    if (stored) {
-      setResult(JSON.parse(stored));
-    } else {
-      router.replace("/");
-    }
-  }, [sessionId, router]);
+  const categoryIdNum = Number(categoryId);
+  const storedResult = useSyncExternalStore<string | null>(
+    subscribeToStorage,
+    () => readGameResultSnapshot(sessionId),
+    () => null,
+  );
+  const result = deserializeGameResult(storedResult);
 
   useEffect(() => {
-    loadResult();
-  }, [loadResult]);
+    if (
+      result === null
+      || result.categoryId !== categoryIdNum
+      || result.difficulty !== difficulty
+    ) {
+      router.replace("/");
+    }
+  }, [categoryIdNum, difficulty, result, router]);
 
-  if (!result) return null;
+  if (
+    !result
+    || result.categoryId !== categoryIdNum
+    || result.difficulty !== difficulty
+  ) {
+    return null;
+  }
 
-  const categoryIdNum = Number(categoryId);
   const categoryLabel = getCategoryLabel(categoryIdNum);
   const difficultyLabel =
     difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
