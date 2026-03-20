@@ -4,6 +4,16 @@ import { test, expect, type Page } from '@playwright/test'
 const CORRECT_ANSWERS = ['Paris', '4', 'Blue', '7', 'Jupiter']
 const WRONG_ANSWERS = ['Madrid', '3', 'Red', '5', 'Saturn']
 
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function answerOption(page: Page, answer: string) {
+  return page.locator('label').filter({
+    hasText: new RegExp(`^${escapeRegExp(answer)}$`),
+  }).first()
+}
+
 async function startGame(page: Page) {
   await page.goto('/')
   // General Knowledge is pre-selected (first slide in the carousel)
@@ -12,17 +22,17 @@ async function startGame(page: Page) {
   await page.waitForURL('**/game/**')
   // Wait for the game content to finish streaming from the server component.
   // The Next button is the last element rendered — if it's present, everything
-  // else (question counter, question text, answer buttons) is also in the DOM.
+  // else (question counter, question text, answer options) is also in the DOM.
   await page.getByRole('button', { name: 'Next', exact: true }).waitFor()
 }
 
 async function completeGame(page: Page, answers: string[]) {
   for (let i = 0; i < answers.length - 1; i++) {
-    await page.getByRole('button', { name: answers[i] }).click()
+    await answerOption(page, answers[i]).click()
     await page.getByRole('button', { name: 'Next', exact: true }).click()
   }
   // Last question: select answer, then 1-second timer auto-advances
-  await page.getByRole('button', { name: answers[answers.length - 1] }).click()
+  await answerOption(page, answers[answers.length - 1]).click()
   await page.waitForURL('**/result**')
   // Wait for result content — sessionStorage read + render is async on the client
   await page.getByRole('button', { name: 'Restart' }).waitFor()
@@ -53,7 +63,7 @@ test.describe('Trivia game flow', () => {
 
     await expect(page.getByText('Question 1/5')).toBeVisible()
     await expect(page.getByText('What is the capital of France?')).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Paris' })).toBeVisible()
+    await expect(answerOption(page, 'Paris')).toBeVisible()
   })
 
   test('Next button is disabled before answering', async ({ page }) => {
@@ -65,14 +75,14 @@ test.describe('Trivia game flow', () => {
   test('Next button is enabled after selecting an answer', async ({ page }) => {
     await startGame(page)
 
-    await page.getByRole('button', { name: 'Paris' }).click()
+    await answerOption(page, 'Paris').click()
     await expect(page.getByRole('button', { name: 'Next', exact: true })).toBeEnabled()
   })
 
   test('advances to next question after clicking Next', async ({ page }) => {
     await startGame(page)
 
-    await page.getByRole('button', { name: 'Paris' }).click()
+    await answerOption(page, 'Paris').click()
     await page.getByRole('button', { name: 'Next', exact: true }).click()
 
     await expect(page.getByText('Question 2/5')).toBeVisible()
@@ -83,7 +93,7 @@ test.describe('Trivia game flow', () => {
     await startGame(page)
 
     for (let i = 0; i < CORRECT_ANSWERS.length - 1; i++) {
-      await page.getByRole('button', { name: CORRECT_ANSWERS[i] }).click()
+      await answerOption(page, CORRECT_ANSWERS[i]).click()
       await page.getByRole('button', { name: 'Next', exact: true }).click()
     }
 
