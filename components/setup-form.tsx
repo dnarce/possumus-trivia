@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,8 @@ export function SetupForm({ categories, action }: SetupFormProps) {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     categories[0] ?? null
   );
+  const categoryLegendId = useId();
+  const difficultyLegendId = useId();
 
   return (
     <form action={action} className="space-y-6 flex flex-col gap-6 items-center justify-center">
@@ -36,14 +38,27 @@ export function SetupForm({ categories, action }: SetupFormProps) {
         value={selectedCategory?.name ?? ""}
       />
 
-      <div className="w-full space-y-3">
-        <Label className="text-lg text-center block">Select a Category</Label>
-        <CategoryCarousel categories={categories} onSelect={setSelectedCategory} />
-      </div>
+      <fieldset className="w-full space-y-3">
+        <legend id={categoryLegendId} className="text-lg text-center block font-medium">
+          Select a Category
+        </legend>
+        <CategoryCarousel
+          categories={categories}
+          onSelect={setSelectedCategory}
+          labelledBy={categoryLegendId}
+        />
+      </fieldset>
 
-      <div className="space-y-3">
-        <Label className="text-lg text-center block">Select a Difficulty</Label>
-        <RadioGroup name="difficulty" defaultValue="easy" className="flex gap-6">
+      <fieldset className="space-y-3">
+        <legend id={difficultyLegendId} className="text-lg text-center block font-medium">
+          Select a Difficulty
+        </legend>
+        <RadioGroup
+          name="difficulty"
+          defaultValue="easy"
+          aria-labelledby={difficultyLegendId}
+          className="flex gap-6"
+        >
           {DIFFICULTIES.map(({ value, label }) => (
             <div key={value} className="flex items-center gap-2">
               <RadioGroupItem value={value} id={value} />
@@ -53,7 +68,7 @@ export function SetupForm({ categories, action }: SetupFormProps) {
             </div>
           ))}
         </RadioGroup>
-      </div>
+      </fieldset>
 
       <Button type="submit" disabled={!selectedCategory} className="w-full">
         Play!

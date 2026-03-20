@@ -52,6 +52,23 @@ describe('CategoryCarousel', () => {
     expect(screen.getByAltText('Entertainment: Film')).toBeInTheDocument()
   })
 
+  it('exposes the categories as a named radio group', () => {
+    render(
+      <>
+        <p id="categories-label">Select a Category</p>
+        <CategoryCarousel
+          categories={MOCK_CATEGORIES}
+          labelledBy="categories-label"
+        />
+      </>
+    )
+
+    expect(
+      screen.getByRole('radiogroup', { name: 'Select a Category' })
+    ).toBeInTheDocument()
+    expect(screen.getAllByRole('radio')).toHaveLength(MOCK_CATEGORIES.length)
+  })
+
   it('renders the correct image src for known categories', () => {
     render(<CategoryCarousel categories={MOCK_CATEGORIES} />)
 

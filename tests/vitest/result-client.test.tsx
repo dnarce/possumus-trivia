@@ -70,6 +70,8 @@ describe('ResultClient', () => {
 
     expect(screen.getByText('20 pts')).toBeInTheDocument()
     expect(screen.getByText(/1 \/ 1 correct/i)).toBeInTheDocument()
+    expect(screen.getByRole('list')).toBeInTheDocument()
+    expect(screen.getAllByRole('listitem')).toHaveLength(1)
     expect(mockReplace).not.toHaveBeenCalled()
   })
 

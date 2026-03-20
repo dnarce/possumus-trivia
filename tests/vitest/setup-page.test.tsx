@@ -46,4 +46,16 @@ describe('SetupPage', () => {
     expect(screen.getByText('Invalid game configuration')).toBeInTheDocument()
     expect(screen.getByText('The selected category or difficulty is not valid. Please choose them again.')).toBeInTheDocument()
   })
+
+  it('groups category and difficulty selectors with semantic legends', async () => {
+    vi.mocked(fetchCategories).mockResolvedValue({
+      trivia_categories: [{ id: 9, name: 'General Knowledge' }],
+    })
+
+    render(await SetupPage({ searchParams: Promise.resolve({}) }))
+
+    expect(screen.getByText('Select a Category', { selector: 'legend' })).toBeInTheDocument()
+    expect(screen.getByRole('radiogroup', { name: 'Select a Category' })).toBeInTheDocument()
+    expect(screen.getByText('Select a Difficulty', { selector: 'legend' })).toBeInTheDocument()
+  })
 })

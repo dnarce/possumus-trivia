@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
 import useEmblaCarousel from "embla-carousel-react";
 import { CATEGORY_IMAGE_MAP, CATEGORY_LABEL_MAP, getCategoryIcon } from "@/lib/category-icons";
@@ -9,16 +9,22 @@ import type { Category } from "@/types/trivia";
 interface CategoryCarouselProps {
   categories: Category[];
   onSelect?: (category: Category) => void;
+  labelledBy?: string;
 }
 
 function numberWithinRange(number: number, min: number, max: number) {
   return Math.min(Math.max(number, min), max);
 }
 
-export function CategoryCarousel({ categories, onSelect }: CategoryCarouselProps) {
+export function CategoryCarousel({
+  categories,
+  onSelect,
+  labelledBy,
+}: CategoryCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center" });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const tweenNodes = useRef<HTMLElement[]>([]);
+  const groupName = useId();
 
   const setTweenNodes = useCallback(() => {
     if (!emblaApi) return;
@@ -77,43 +83,54 @@ export function CategoryCarousel({ categories, onSelect }: CategoryCarouselProps
     }
   }, [categories, onSelect, selectedIndex]);
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === "ArrowLeft") emblaApi?.scrollPrev();
-      else if (e.key === "ArrowRight") emblaApi?.scrollNext();
+  const selectCategory = useCallback(
+    (index: number) => {
+      emblaApi?.scrollTo(index);
+      setSelectedIndex(index);
     },
     [emblaApi]
   );
 
   return (
-    <div
-      className="overflow-hidden outline-none"
-      ref={emblaRef}
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
-    >
-      <div className="flex touch-pan-y">
+    <div className="overflow-hidden" ref={emblaRef}>
+      <div
+        className="flex touch-pan-y"
+        role="radiogroup"
+        aria-labelledby={labelledBy}
+      >
         {categories.map((category, index) => {
           const CategoryIcon = getCategoryIcon(category.id);
           const imageSrc = CATEGORY_IMAGE_MAP[category.id as keyof typeof CATEGORY_IMAGE_MAP];
           const label = CATEGORY_LABEL_MAP[category.id as keyof typeof CATEGORY_LABEL_MAP] ?? category.name;
           const isSelected = index === selectedIndex;
+          const inputId = `${groupName}-${category.id}`;
 
           return (
             <div
               key={category.id}
               className="flex-[0_0_55%] min-w-0 px-2 cursor-grab active:cursor-grabbing"
-              onClick={() => emblaApi?.scrollTo(index)}
+              role="presentation"
             >
+              <input
+                id={inputId}
+                type="radio"
+                name={groupName}
+                value={category.id}
+                checked={isSelected}
+                onChange={() => selectCategory(index)}
+                onFocus={() => emblaApi?.scrollTo(index)}
+                className="peer sr-only"
+              />
               <div
                 data-scale
                 className="will-change-transform"
                 style={{ transformOrigin: "center center" }}
               >
-                <div
+                <label
+                  htmlFor={inputId}
                   className={`relative rounded-2xl overflow-hidden transition-colors duration-200 ${
                     isSelected ? "border-primary shadow-lg shadow-primary/20" : "border-white/10"
-                  }`}
+                  } block cursor-pointer peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50`}
                 >
                   <Image
                     src={imageSrc ?? CATEGORY_IMAGE_MAP[9]} // fallback to general knowledge
@@ -129,7 +146,7 @@ export function CategoryCarousel({ categories, onSelect }: CategoryCarouselProps
                       <span className="text-white text-base font-medium leading-tight">{label}</span>
                     </div>
                   </div>
-                </div>
+                </label>
               </div>
             </div>
           );

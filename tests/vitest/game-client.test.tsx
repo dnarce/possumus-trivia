@@ -5,8 +5,20 @@ import { GameClient } from '@/components/game-client'
 import type { Question } from '@/types/trivia'
 
 vi.mock('@/components/SplitText', () => ({
-  default: ({ text, className }: { text: string; className?: string }) => (
-    <p className={className}>{text}</p>
+  default: ({
+    text,
+    className,
+    id,
+    tag: Tag = 'p',
+  }: {
+    text: string;
+    className?: string;
+    id?: string;
+    tag?: keyof JSX.IntrinsicElements;
+  }) => (
+    <Tag id={id} className={className}>
+      {text}
+    </Tag>
   ),
 }))
 
@@ -57,6 +69,17 @@ describe('GameClient', () => {
     expect(screen.getByText('Question 1/2')).toBeInTheDocument()
   })
 
+  it('renders the answers as a grouped radio selection', () => {
+    render(<GameClient {...defaultProps} />)
+
+    expect(screen.getAllByRole('radio')).toHaveLength(4)
+    expect(
+      screen.getByText('Choose one answer for the current question', {
+        selector: 'legend',
+      })
+    ).toBeInTheDocument()
+  })
+
   it('displays the category, difficulty and initial score in the header', () => {
     render(<GameClient {...defaultProps} />)
     expect(screen.getByText('General Knowledge')).toBeInTheDocument()
@@ -71,7 +94,7 @@ describe('GameClient', () => {
 
   it('Next button is enabled after selecting an option', () => {
     render(<GameClient {...defaultProps} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Paris' }))
+    fireEvent.click(screen.getByRole('radio', { name: 'Paris' }))
     expect(screen.getByRole('button', { name: 'Next' })).not.toBeDisabled()
     expect(screen.getByText('Score 20 pts')).toBeInTheDocument()
   })
@@ -79,10 +102,10 @@ describe('GameClient', () => {
   it('does not allow changing the answer once selected', async () => {
     vi.useFakeTimers()
     render(<GameClient {...defaultProps} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Madrid' }))  // incorrect, first click
-    fireEvent.click(screen.getByRole('button', { name: 'Paris' }))   // attempt to change
+    fireEvent.click(screen.getByRole('radio', { name: 'Madrid' }))  // incorrect, first click
+    fireEvent.click(screen.getByRole('radio', { name: 'Paris' }))   // attempt to change
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
-    fireEvent.click(screen.getByRole('button', { name: '4' }))       // correct
+    fireEvent.click(screen.getByRole('radio', { name: '4' }))       // correct
     await act(async () => {
       vi.advanceTimersByTime(1000)
     })
@@ -95,7 +118,7 @@ describe('GameClient', () => {
 
   it('advances to the next question after clicking Next', () => {
     render(<GameClient {...defaultProps} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Paris' }))
+    fireEvent.click(screen.getByRole('radio', { name: 'Paris' }))
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
     expect(screen.getByText('How much is 2 + 2?')).toBeInTheDocument()
     expect(screen.getByText('Question 2/2')).toBeInTheDocument()
@@ -104,9 +127,9 @@ describe('GameClient', () => {
   it('auto-finishes after answering the last question', async () => {
     vi.useFakeTimers()
     render(<GameClient {...defaultProps} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Paris' }))
+    fireEvent.click(screen.getByRole('radio', { name: 'Paris' }))
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
-    fireEvent.click(screen.getByRole('button', { name: '4' }))
+    fireEvent.click(screen.getByRole('radio', { name: '4' }))
     await act(async () => {
       vi.advanceTimersByTime(1000)
     })
@@ -118,9 +141,9 @@ describe('GameClient', () => {
   it('saves the correct score in sessionStorage when finished', async () => {
     vi.useFakeTimers()
     render(<GameClient {...defaultProps} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Paris' }))  // correct
+    fireEvent.click(screen.getByRole('radio', { name: 'Paris' }))  // correct
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
-    fireEvent.click(screen.getByRole('button', { name: '3' }))      // incorrect
+    fireEvent.click(screen.getByRole('radio', { name: '3' }))      // incorrect
     await act(async () => {
       vi.advanceTimersByTime(1000)
     })
@@ -135,9 +158,9 @@ describe('GameClient', () => {
   it('redirects to result with correct params when finished', async () => {
     vi.useFakeTimers()
     render(<GameClient {...defaultProps} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Paris' }))
+    fireEvent.click(screen.getByRole('radio', { name: 'Paris' }))
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
-    fireEvent.click(screen.getByRole('button', { name: '4' }))
+    fireEvent.click(screen.getByRole('radio', { name: '4' }))
     await act(async () => {
       vi.advanceTimersByTime(1000)
     })

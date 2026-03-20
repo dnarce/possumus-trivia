@@ -50,13 +50,13 @@ function ReviewDialog({
         <DialogHeader>
           <DialogTitle>Question review</DialogTitle>
         </DialogHeader>
-        <div className="space-y-3 pt-2">
+        <ol className="space-y-3 pt-2">
           {questions.map((question, i) => {
             const answer = answers[i];
             const isCorrect = answer?.isCorrect;
 
             return (
-              <div key={question.index} className="space-y-2">
+              <li key={question.index} className="space-y-2">
                 <div className="flex items-start gap-3">
                   <div className="mt-0.5 shrink-0">
                     {isCorrect ? (
@@ -85,10 +85,10 @@ function ReviewDialog({
                     </span>
                   </div>
                 </div>
-              </div>
+                </li>
             );
           })}
-        </div>
+        </ol>
       </DialogContent>
     </Dialog>
   );

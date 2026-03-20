@@ -1,12 +1,13 @@
 "use client";
 
-import { createElement, useCallback, useEffect, useState } from "react";
+import { createElement, useCallback, useEffect, useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Question, PlayerAnswer, TriviaConfig } from "@/types/trivia";
 import { getCategoryIcon, getCategoryLabel } from "@/lib/category-icons";
 import { clearGameResult, persistGameResult } from "@/lib/game-result-storage";
+import { cn } from "@/lib/utils";
 import SplitText from "./SplitText";
 
 const POINTS_PER_CORRECT = 20;
@@ -27,6 +28,8 @@ export function GameClient({
   difficulty,
 }: GameClientProps) {
   const router = useRouter();
+  const questionHeadingId = useId();
+  const answerLegendId = useId();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [answers, setAnswers] = useState<PlayerAnswer[]>([]);
@@ -134,6 +137,7 @@ export function GameClient({
 
       <SplitText
         key={currentIndex}
+        id={questionHeadingId}
         text={currentQuestion.text}
         tag="h1"
         className="text-3xl sm:text-6xl text-shadow-lg font-bold tracking-tight text-center py-6 sm:py-10"
@@ -149,25 +153,51 @@ export function GameClient({
       />
 
       <div className="flex flex-col gap-3">
-        <div className="px-4 sm:px-8 space-y-2 sm:space-y-2.5 pb-4 sm:pb-6">
-          {currentQuestion.options.map((option) => (
-            <Button
-              key={option}
-              variant={getOptionVariant(option)}
-              className="w-full justify-center gap-2 h-auto min-h-10 py-2.5 whitespace-normal text-center sm:min-h-12 sm:px-4 sm:text-lg sm:font-semibold"
-              onClick={() => handleSelect(option)}
-              disabled={isAnswered}
-              size="default"
-            >
-              {isAnswered && option === currentQuestion.correctAnswer ? (
-                <CheckCircle2 className="h-5 w-5" />
-              ) : isAnswered && option === selectedOption ? (
-                <XCircle className="h-5 w-5" />
-              ) : null}
-              {option}
-            </Button>
-          ))}
-        </div>
+        <fieldset className="px-4 sm:px-8 pb-4 sm:pb-6">
+          <legend id={answerLegendId} className="sr-only">
+            Choose one answer for the current question
+          </legend>
+          <div
+            className="space-y-2 sm:space-y-2.5"
+            aria-labelledby={`${questionHeadingId} ${answerLegendId}`}
+          >
+            {currentQuestion.options.map((option, optionIndex) => {
+              const optionId = `question-${currentQuestion.index}-option-${optionIndex}`;
+              const variant = getOptionVariant(option);
+
+              return (
+                <label key={option} htmlFor={optionId} className="block">
+                  <input
+                    id={optionId}
+                    type="radio"
+                    name={`question-${currentQuestion.index}`}
+                    value={option}
+                    checked={selectedOption === option}
+                    onChange={() => handleSelect(option)}
+                    disabled={isAnswered}
+                    className="peer sr-only"
+                  />
+                  <span
+                    className={cn(
+                      "inline-flex w-full items-center justify-center gap-2 rounded-full backdrop-blur-sm border border-white/15 shadow-sm bg-clip-padding text-sm font-medium transition-all outline-none select-none min-h-10 py-2.5 whitespace-normal text-center sm:min-h-12 sm:px-4 sm:text-lg sm:font-semibold peer-focus-visible:border-ring peer-focus-visible:ring-3 peer-focus-visible:ring-ring/50",
+                      variant === "success" && "bg-success text-success-foreground",
+                      variant === "destructive" && "bg-destructive text-destructive-foreground",
+                      variant === "default" && "bg-white/8 text-card-foreground",
+                      isAnswered && "cursor-default opacity-100",
+                    )}
+                  >
+                    {isAnswered && option === currentQuestion.correctAnswer ? (
+                      <CheckCircle2 className="h-5 w-5" />
+                    ) : isAnswered && option === selectedOption ? (
+                      <XCircle className="h-5 w-5" />
+                    ) : null}
+                    {option}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
 
         {!isLastQuestion && (
           <Button
