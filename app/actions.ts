@@ -10,13 +10,17 @@ const TOKEN_COOKIE = 'opentdb-token'
 const TOKEN_MAX_AGE = 60 * 60 * 6
 
 export async function startGame(formData: FormData) {
-  const input = normalizeTriviaInput(formData.get('categoryId'), formData.get('difficulty'))
+  const input = normalizeTriviaInput(
+    formData.get('categoryId'),
+    formData.get('categoryName'),
+    formData.get('difficulty'),
+  )
 
   if (!input) {
     redirect('/?error=config')
   }
 
-  const { categoryId, difficulty } = input
+  const { categoryId, categoryName, difficulty } = input
 
   const cookieStore = await cookies()
   let sessionId = cookieStore.get(TOKEN_COOKIE)?.value
@@ -31,5 +35,11 @@ export async function startGame(formData: FormData) {
     cookieStore.set(TOKEN_COOKIE, sessionId, { maxAge: TOKEN_MAX_AGE, httpOnly: true })
   }
 
-  redirect(`/game/${sessionId}?categoryId=${categoryId}&difficulty=${difficulty}`)
+  const searchParams = new URLSearchParams({
+    categoryId: String(categoryId),
+    categoryName,
+    difficulty,
+  })
+
+  redirect(`/game/${sessionId}?${searchParams}`)
 }

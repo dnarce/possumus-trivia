@@ -23,6 +23,7 @@ import type { PlayerAnswer, Question } from "@/types/trivia";
 interface ResultClientProps {
   sessionId: string;
   categoryId: string;
+  categoryName: string;
   difficulty: string;
   restartAction: (formData: FormData) => void;
 }
@@ -96,6 +97,7 @@ function ReviewDialog({
 export function ResultClient({
   sessionId,
   categoryId,
+  categoryName,
   difficulty,
   restartAction,
 }: ResultClientProps) {
@@ -112,21 +114,23 @@ export function ResultClient({
     if (
       result === null
       || result.categoryId !== categoryIdNum
+      || result.categoryName !== categoryName
       || result.difficulty !== difficulty
     ) {
       router.replace("/");
     }
-  }, [categoryIdNum, difficulty, result, router]);
+  }, [categoryIdNum, categoryName, difficulty, result, router]);
 
   if (
     !result
     || result.categoryId !== categoryIdNum
+    || result.categoryName !== categoryName
     || result.difficulty !== difficulty
   ) {
     return null;
   }
 
-  const categoryLabel = getCategoryLabel(categoryIdNum);
+  const categoryLabel = getCategoryLabel(categoryIdNum, categoryName);
   const difficultyLabel =
     difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
   const correctCount = result.answers.filter((a) => a.isCorrect).length;
@@ -178,6 +182,7 @@ export function ResultClient({
 
         <form action={restartAction}>
           <input type="hidden" name="categoryId" value={categoryId} />
+          <input type="hidden" name="categoryName" value={categoryName} />
           <input type="hidden" name="difficulty" value={difficulty} />
           <Button variant="default" type="submit" className="w-full">
             Restart

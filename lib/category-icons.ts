@@ -24,7 +24,6 @@ import {
   ScrollText,
   Smartphone,
   MonitorPlay,
-  BadgeQuestionMark,
 } from 'lucide-react'
 
 export const TRIVIA_CATEGORY_IDS = [
@@ -56,8 +55,7 @@ export const TRIVIA_CATEGORY_IDS = [
 
 export type TriviaCategoryId = (typeof TRIVIA_CATEGORY_IDS)[number]
 
-export const DEFAULT_CATEGORY_ICON = BadgeQuestionMark
-export const DEFAULT_CATEGORY_LABEL = 'Unknown Category'
+const FALLBACK_CATEGORY_ID = 9
 
 export const CATEGORY_ICON_MAP: Record<TriviaCategoryId, LucideIcon> = {
   9: Brain,
@@ -140,10 +138,13 @@ export const CATEGORY_IMAGE_MAP: Record<TriviaCategoryId, string> = {
   32: '/images/categories/entertainment_cartoon-and-animations.avif',
 }
 
+export const DEFAULT_CATEGORY_ICON = CATEGORY_ICON_MAP[FALLBACK_CATEGORY_ID as TriviaCategoryId]
+export const DEFAULT_CATEGORY_LABEL = CATEGORY_LABEL_MAP[FALLBACK_CATEGORY_ID as TriviaCategoryId]
+
 export function getCategoryIcon(categoryId: number): LucideIcon {
   return CATEGORY_ICON_MAP[categoryId as TriviaCategoryId] ?? DEFAULT_CATEGORY_ICON
 }
 
-export function getCategoryLabel(categoryId: number): string {
-  return CATEGORY_LABEL_MAP[categoryId as TriviaCategoryId] ?? DEFAULT_CATEGORY_LABEL
+export function getCategoryLabel(categoryId: number, fallbackLabel?: string): string {
+  return CATEGORY_LABEL_MAP[categoryId as TriviaCategoryId] ?? fallbackLabel ?? DEFAULT_CATEGORY_LABEL
 }

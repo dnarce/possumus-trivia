@@ -23,7 +23,7 @@ describe('GamePage', () => {
     render(
       await GamePage({
         params: Promise.resolve({ sessionId: 'session-abc' }),
-        searchParams: Promise.resolve({ categoryId: '9', difficulty: 'easy' }),
+        searchParams: Promise.resolve({ categoryId: '9', categoryName: 'General Knowledge', difficulty: 'easy' }),
       })
     )
 
@@ -38,18 +38,18 @@ describe('GamePage', () => {
     render(
       await GamePage({
         params: Promise.resolve({ sessionId: 'session-abc' }),
-        searchParams: Promise.resolve({ categoryId: '9', difficulty: 'easy' }),
+        searchParams: Promise.resolve({ categoryId: '9', categoryName: 'General Knowledge', difficulty: 'easy' }),
       })
     )
 
     expect(screen.getByText('Not enough questions')).toBeInTheDocument()
   })
 
-  it('shows a controlled error when category or difficulty are outside the allowed domain', async () => {
+  it('shows a controlled error when category name or difficulty are invalid', async () => {
     render(
       await GamePage({
         params: Promise.resolve({ sessionId: 'session-abc' }),
-        searchParams: Promise.resolve({ categoryId: '999', difficulty: 'legendary' }),
+        searchParams: Promise.resolve({ categoryId: '999', categoryName: '', difficulty: 'legendary' }),
       })
     )
 

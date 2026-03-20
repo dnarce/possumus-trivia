@@ -15,6 +15,7 @@ interface GameClientProps {
   questions: Question[];
   sessionId: string;
   categoryId: number;
+  categoryName: string;
   difficulty: TriviaConfig["difficulty"];
 }
 
@@ -22,6 +23,7 @@ export function GameClient({
   questions,
   sessionId,
   categoryId,
+  categoryName,
   difficulty,
 }: GameClientProps) {
   const router = useRouter();
@@ -32,7 +34,7 @@ export function GameClient({
   const currentQuestion = questions[currentIndex];
   const isAnswered = selectedOption !== null;
   const isLastQuestion = currentIndex === questions.length - 1;
-  const categoryLabel = getCategoryLabel(categoryId);
+  const categoryLabel = getCategoryLabel(categoryId, categoryName);
   const difficultyLabel =
     difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
   const score =
@@ -67,10 +69,11 @@ export function GameClient({
         score,
         questions,
         categoryId,
+        categoryName,
         difficulty,
       });
       router.push(
-        `/game/${sessionId}/result?categoryId=${categoryId}&difficulty=${difficulty}`,
+        `/game/${sessionId}/result?categoryId=${categoryId}&categoryName=${encodeURIComponent(categoryName)}&difficulty=${difficulty}`,
       );
     } else {
       setCurrentIndex(currentIndex + 1);
@@ -79,6 +82,7 @@ export function GameClient({
   }, [
     answers,
     categoryId,
+    categoryName,
     currentIndex,
     currentQuestion,
     difficulty,

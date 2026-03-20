@@ -28,6 +28,7 @@ vi.mock('@/components/ui/dialog', () => ({
 const defaultProps = {
   sessionId: 'session-abc',
   categoryId: '9',
+  categoryName: 'General Knowledge',
   difficulty: 'easy',
   restartAction: vi.fn(),
 }
@@ -51,6 +52,7 @@ const storedResult = {
     },
   ],
   categoryId: 9,
+  categoryName: 'General Knowledge',
   difficulty: 'easy',
 } as const
 

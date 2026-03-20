@@ -5,6 +5,7 @@ export interface StoredGameResult {
   score: number
   questions: Question[]
   categoryId: number
+  categoryName: string
   difficulty: TriviaConfig['difficulty']
 }
 
@@ -34,6 +35,7 @@ function isStoredGameResult(value: unknown): value is StoredGameResult {
     && typeof (value as StoredGameResult).score === 'number'
     && Number.isFinite((value as StoredGameResult).score)
     && Number.isInteger((value as StoredGameResult).categoryId)
+    && typeof (value as StoredGameResult).categoryName === 'string'
     && typeof (value as StoredGameResult).difficulty === 'string'
 }
 

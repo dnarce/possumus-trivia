@@ -30,6 +30,11 @@ export function SetupForm({ categories, action }: SetupFormProps) {
         name="categoryId"
         value={selectedCategory ? String(selectedCategory.id) : ""}
       />
+      <input
+        type="hidden"
+        name="categoryName"
+        value={selectedCategory?.name ?? ""}
+      />
 
       <div className="w-full space-y-3">
         <Label className="text-lg text-center block">Select a Category</Label>

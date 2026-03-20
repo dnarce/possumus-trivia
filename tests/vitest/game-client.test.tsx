@@ -35,6 +35,7 @@ const defaultProps = {
   questions: mockQuestions,
   sessionId: 'session-abc',
   categoryId: 9,
+  categoryName: 'General Knowledge',
   difficulty: 'medium',
 } satisfies ComponentProps<typeof GameClient>
 
@@ -110,7 +111,7 @@ describe('GameClient', () => {
       vi.advanceTimersByTime(1000)
     })
     expect(mockPush).toHaveBeenCalledWith(
-      '/game/session-abc/result?categoryId=9&difficulty=medium'
+      '/game/session-abc/result?categoryId=9&categoryName=General%20Knowledge&difficulty=medium'
     )
   })
 
@@ -128,6 +129,7 @@ describe('GameClient', () => {
     const durableStored = JSON.parse(localStorage.getItem('game-session-abc')!)
     expect(stored.score).toBe(20) // 1 correct × 20
     expect(durableStored.score).toBe(20)
+    expect(stored.categoryName).toBe('General Knowledge')
   })
 
   it('redirects to result with correct params when finished', async () => {
@@ -141,7 +143,7 @@ describe('GameClient', () => {
     })
 
     expect(mockPush).toHaveBeenCalledWith(
-      '/game/session-abc/result?categoryId=9&difficulty=medium'
+      '/game/session-abc/result?categoryId=9&categoryName=General%20Knowledge&difficulty=medium'
     )
   })
 })

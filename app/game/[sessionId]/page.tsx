@@ -8,7 +8,7 @@ import { normalizeTriviaInput } from '@/lib/trivia-config'
 
 interface GamePageProps {
   params: Promise<{ sessionId: string }>
-  searchParams: Promise<{ categoryId?: string; difficulty?: string }>
+  searchParams: Promise<{ categoryId?: string; categoryName?: string; difficulty?: string }>
 }
 
 const INVALID_CONFIG_ERROR = -2
@@ -44,19 +44,23 @@ function ErrorPage({ code }: { code: number }) {
 
 export default async function GamePage({ params, searchParams }: GamePageProps) {
   const { sessionId } = await params
-  const { categoryId, difficulty } = await searchParams
-  const input = normalizeTriviaInput(categoryId, difficulty)
+  const { categoryId, categoryName, difficulty } = await searchParams
+  const input = normalizeTriviaInput(categoryId, categoryName, difficulty)
 
   if (!input) {
     return <ErrorPage code={INVALID_CONFIG_ERROR} />
   }
 
-  const { categoryId: parsedCategoryId, difficulty: normalizedDifficulty } = input
+  const {
+    categoryId: parsedCategoryId,
+    categoryName: normalizedCategoryName,
+    difficulty: normalizedDifficulty,
+  } = input
 
   const config: TriviaConfig = {
     ...TRIVIA_DEFAULTS,
     categoryId: parsedCategoryId,
-    categoryName: '',
+    categoryName: normalizedCategoryName,
     difficulty: normalizedDifficulty,
   }
 
@@ -83,7 +87,13 @@ export default async function GamePage({ params, searchParams }: GamePageProps) 
   return (
     <main className="flex h-dvh items-center justify-center">
       <div className="w-full max-w-4xl px-4 h-full">
-        <GameClient questions={questions} sessionId={sessionId} categoryId={parsedCategoryId} difficulty={normalizedDifficulty} />
+        <GameClient
+          questions={questions}
+          sessionId={sessionId}
+          categoryId={parsedCategoryId}
+          categoryName={normalizedCategoryName}
+          difficulty={normalizedDifficulty}
+        />
       </div>
     </main>
   )

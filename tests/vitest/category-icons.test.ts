@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { BadgeQuestionMark, Brain, BookOpen } from 'lucide-react'
+import { Brain, BookOpen } from 'lucide-react'
 import {
   CATEGORY_ICON_MAP,
   CATEGORY_LABEL_MAP,
@@ -23,8 +23,8 @@ describe('CATEGORY_ICON_MAP', () => {
   })
 
   it('falls back to the default icon for unknown categories', () => {
-    expect(DEFAULT_CATEGORY_ICON).toBe(BadgeQuestionMark)
-    expect(getCategoryIcon(999)).toBe(BadgeQuestionMark)
+    expect(DEFAULT_CATEGORY_ICON).toBe(Brain)
+    expect(getCategoryIcon(999)).toBe(Brain)
   })
 })
 
@@ -40,7 +40,8 @@ describe('CATEGORY_LABEL_MAP', () => {
     expect(getCategoryLabel(10)).toBe('Entertainment: Books')
   })
 
-  it('falls back to the default label for unknown categories', () => {
+  it('falls back to the provided label or the default supported label for unknown categories', () => {
+    expect(getCategoryLabel(999, 'New Category')).toBe('New Category')
     expect(getCategoryLabel(999)).toBe(DEFAULT_CATEGORY_LABEL)
   })
 })
