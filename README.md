@@ -136,7 +136,7 @@ possumus-trivia/
 ### Instalación
 
 ```bash
-git clone https://github.com/<tu-usuario>/possumus-trivia.git
+git clone https://github.com/dnarce/possumus-trivia.git
 cd possumus-trivia
 npm install
 ```
