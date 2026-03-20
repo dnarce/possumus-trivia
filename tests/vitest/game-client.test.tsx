@@ -3,6 +3,12 @@ import { act, fireEvent, render, screen } from '@testing-library/react'
 import { GameClient } from '@/components/game-client'
 import type { Question } from '@/types/trivia'
 
+vi.mock('@/components/SplitText', () => ({
+  default: ({ text, className }: { text: string; className?: string }) => (
+    <p className={className}>{text}</p>
+  ),
+}))
+
 const mockPush = vi.fn()
 
 vi.mock('next/navigation', () => ({
