@@ -113,6 +113,33 @@ export const CATEGORY_LABEL_MAP: Record<TriviaCategoryId, string> = {
   32: 'Entertainment: Cartoon & Animations',
 }
 
+export const CATEGORY_IMAGE_MAP: Record<TriviaCategoryId, string> = {
+  9: '/images/general_knowledge.png',
+  10: '/images/entertainment_books.png',
+  11: '/images/entertainment_films.png',
+  12: '/images/entertainment_music.png',
+  13: '/images/entertainment_musicals-and-theatres.png',
+  14: '/images/entertainment_television.png',
+  15: '/images/entertainment_video-games.png',
+  16: '/images/entertainment_board-games.png.png',
+  17: '/images/science-and-nature.png',
+  18: '/images/science-computers.png',
+  19: '/images/science-mathematics.png',
+  20: '/images/mythology.png',
+  21: '/images/sports.png',
+  22: '/images/geography.png',
+  23: '/images/history.png',
+  24: '/images/politics.png',
+  25: '/images/art.png',
+  26: '/images/celebrities.png',
+  27: '/images/animals.png',
+  28: '/images/vehicles.png',
+  29: '/images/entertainment_comics.png',
+  30: '/images/science_gadgets.png',
+  31: '/images/entertainment_japanese-anime-and-manga.png',
+  32: '/images/entertainment_cartoon-and-animations.png',
+}
+
 export function getCategoryIcon(categoryId: number): LucideIcon {
   return CATEGORY_ICON_MAP[categoryId as TriviaCategoryId] ?? DEFAULT_CATEGORY_ICON
 }

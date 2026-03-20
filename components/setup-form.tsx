@@ -1,33 +1,15 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore } from "react";
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-} from "@/components/ui/combobox";
+import { useState } from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { CardContent } from "@/components/ui/card";
-import { GlassCard } from "@/components/ui/glass-card";
-import { Input } from "@/components/ui/input";
-import { InputGroupAddon, InputGroupText } from "@/components/ui/input-group";
-import { getCategoryIcon } from "@/lib/category-icons";
+import { CategoryCarousel } from "@/components/category-carousel";
 import type { Category } from "@/types/trivia";
 
 interface SetupFormProps {
   categories: Category[];
   action: (formData: FormData) => void;
-}
-
-interface CategoryOption {
-  value: string;
-  label: string;
-  icon: ReturnType<typeof getCategoryIcon>;
 }
 
 const DIFFICULTIES = [
@@ -37,112 +19,40 @@ const DIFFICULTIES = [
 ];
 
 export function SetupForm({ categories, action }: SetupFormProps) {
-  const isHydrated = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false
-  );
-
-  const categoryOptions = useMemo(
-    () =>
-      categories.map((category) => ({
-        value: String(category.id),
-        label: category.name,
-        icon: getCategoryIcon(category.id),
-      })),
-    [categories]
-  );
-
-  const [selectedCategory, setSelectedCategory] = useState<CategoryOption | null>(
-    null
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    categories[0] ?? null
   );
 
   return (
-    <GlassCard>
-      <CardContent className="space-y-3 p-8">
-        <form action={action} className="space-y-6">
-          <input
-            type="hidden"
-            name="categoryId"
-            value={selectedCategory?.value ?? ""}
-          />
+    <form action={action} className="space-y-6 flex flex-col gap-6 items-center justify-center">
+      <input
+        type="hidden"
+        name="categoryId"
+        value={selectedCategory ? String(selectedCategory.id) : ""}
+      />
 
-          <div className="space-y-2">
-            <Label className="text-lg">Category</Label>
-            {isHydrated ? (
-              <Combobox
-                items={categoryOptions}
-                value={selectedCategory}
-                onValueChange={setSelectedCategory}
-                isItemEqualToValue={(item, value) => item.value === value.value}
-              >
-                <ComboboxInput
-                  className="w-full"
-                  placeholder="Search a category"
-                  showClear
-                >
-                  {selectedCategory ? (
-                    <InputGroupAddon align="inline-start">
-                      <InputGroupText>
-                        <selectedCategory.icon className="size-4 text-primary" />
-                      </InputGroupText>
-                    </InputGroupAddon>
-                  ) : null}
-                </ComboboxInput>
-                <ComboboxContent>
-                  <ComboboxEmpty>No category found.</ComboboxEmpty>
-                  <ComboboxList>
-                    {(category: CategoryOption) => (
-                      <ComboboxItem
-                        key={category.value}
-                        value={category}
-                        className="gap-3 py-2"
-                      >
-                        <category.icon className="size-4 text-primary" />
-                        <span>{category.label}</span>
-                      </ComboboxItem>
-                    )}
-                  </ComboboxList>
-                </ComboboxContent>
-              </Combobox>
-            ) : (
-              <Input
-                value=""
-                readOnly
-                placeholder="Search a category"
-                aria-hidden="true"
-                tabIndex={-1}
-              />
-            )}
-          </div>
+      <div className="w-full space-y-3">
+        <Label className="text-lg text-center block">Select a Category</Label>
+        <CategoryCarousel categories={categories} onSelect={setSelectedCategory} />
+      </div>
 
-          <div className="space-y-3">
-            <Label className="text-lg">Difficulty</Label>
-            <RadioGroup
-              name="difficulty"
-              defaultValue="easy"
-              className="flex gap-6"
-            >
-              {DIFFICULTIES.map(({ value, label }) => (
-                <div key={value} className="flex items-center gap-2">
-                  <RadioGroupItem value={value} id={value} />
-                  <Label htmlFor={value} className="cursor-pointer">
-                    {label}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-          </div>
+      <div className="space-y-3">
+        <Label className="text-lg text-center block">Select a Difficulty</Label>
+        <RadioGroup name="difficulty" defaultValue="easy" className="flex gap-6">
+          {DIFFICULTIES.map(({ value, label }) => (
+            <div key={value} className="flex items-center gap-2">
+              <RadioGroupItem value={value} id={value} />
+              <Label htmlFor={value} className="cursor-pointer">
+                {label}
+              </Label>
+            </div>
+          ))}
+        </RadioGroup>
+      </div>
 
-          <Button
-            type="submit"
-            disabled={!selectedCategory}
-            className="w-full"
-          >
-            Play!
-          </Button>
-        </form>
-      </CardContent>
-    </GlassCard>
+      <Button type="submit" disabled={!selectedCategory} className="w-full">
+        Play!
+      </Button>
+    </form>
   );
 }

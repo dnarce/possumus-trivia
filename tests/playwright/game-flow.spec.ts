@@ -4,14 +4,9 @@ import { test, expect, type Page } from '@playwright/test'
 const CORRECT_ANSWERS = ['Paris', '4', 'Blue', '7', 'Jupiter']
 const WRONG_ANSWERS = ['Madrid', '3', 'Red', '5', 'Saturn']
 
-async function selectCategory(page: Page, name: string) {
-  await page.getByRole('combobox').click()
-  await page.getByRole('option', { name }).click()
-}
-
 async function startGame(page: Page) {
   await page.goto('/')
-  await selectCategory(page, 'General Knowledge')
+  // General Knowledge is pre-selected (first slide in the carousel)
   await page.getByLabel('Easy').click()
   await page.getByRole('button', { name: 'Play!' }).click()
   await page.waitForURL('**/game/**')
@@ -29,10 +24,10 @@ async function completeGame(page: Page, answers: string[]) {
 
 test.describe('Trivia game flow', () => {
 
-  test('setup page shows categories and difficulty options', async ({ page }) => {
+  test('setup page shows category carousel and difficulty options', async ({ page }) => {
     await page.goto('/')
 
-    await expect(page.getByRole('combobox')).toBeVisible()
+    await expect(page.getByAltText('General Knowledge')).toBeVisible()
     await expect(page.getByLabel('Easy')).toBeVisible()
     await expect(page.getByLabel('Medium')).toBeVisible()
     await expect(page.getByLabel('Hard')).toBeVisible()
