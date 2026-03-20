@@ -142,7 +142,7 @@ export function GameClient({
             <Button
               key={option}
               variant={getOptionVariant(option)}
-              className="w-full justify-center gap-2 sm:h-12 sm:px-4 sm:text-lg sm:font-semibold"
+              className="w-full justify-center gap-2 h-auto min-h-10 py-2.5 whitespace-normal text-center sm:min-h-12 sm:px-4 sm:text-lg sm:font-semibold"
               onClick={() => handleSelect(option)}
               disabled={isAnswered}
               size="default"
