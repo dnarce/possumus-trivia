@@ -98,9 +98,17 @@ export function GameClient({
   }
 
   return (
-    <div className="flex flex-col justify-between h-full py-16">
-      <div className="grid grid-cols-[1fr_auto] items-center gap-2 text-sm sm:grid-cols-[1fr_auto_1fr] sm:gap-3">
-        <div className="flex min-w-0 items-center gap-1.5 sm:justify-self-start sm:gap-2">
+    <div className="flex flex-col justify-between h-full py-8 sm:py-16">
+      <div className="flex flex-col gap-2 text-sm sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-3">
+        <div className="flex items-center justify-between gap-2 whitespace-nowrap text-sm font-medium sm:contents">
+          <p className="sm:justify-self-center sm:text-center mx-1 font-semibold">
+            Question {currentIndex + 1}/{questions.length}
+          </p>
+          <p className="sm:justify-self-end font-semibold">
+            Score {score} pts
+          </p>
+        </div>
+        <div className="flex min-w-0 items-center gap-1.5 sm:order-first sm:justify-self-start sm:gap-2">
           <div className="inline-flex min-w-0 items-center gap-2 whitespace-nowrap rounded-full border border-white/15 bg-white/8 px-3 py-1.5 text-sm shadow-sm backdrop-blur-sm">
             {createElement(getCategoryIcon(categoryId), {
               className: "size-4",
@@ -110,14 +118,6 @@ export function GameClient({
           <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-white/15 bg-white/8 px-3 py-1.5 text-sm shadow-sm backdrop-blur-sm">
             {difficultyLabel}
           </div>
-        </div>
-        <div className="flex items-center justify-end gap-2 whitespace-nowrap text-sm font-medium sm:contents">
-          <p className="text-right sm:justify-self-center sm:text-center mx-1 font-semibold">
-            Question {currentIndex + 1}/{questions.length}
-          </p>
-          <p className="text-right sm:justify-self-end font-semibold">
-            Score {score} pts
-          </p>
         </div>
       </div>
 
@@ -136,36 +136,38 @@ export function GameClient({
         textAlign="center"
       />
 
-      <div className="px-4 sm:px-8 py-4 sm:py-6 space-y-2 sm:space-y-2.5">
-        {currentQuestion.options.map((option) => (
-          <Button
-            key={option}
-            variant={getOptionVariant(option)}
-            className="w-full justify-center gap-2 sm:h-12 sm:px-4 sm:text-lg sm:font-semibold"
-            onClick={() => handleSelect(option)}
-            disabled={isAnswered}
-            size="default"
-          >
-            {isAnswered && option === currentQuestion.correctAnswer ? (
-              <CheckCircle2 className="h-5 w-5" />
-            ) : isAnswered && option === selectedOption ? (
-              <XCircle className="h-5 w-5" />
-            ) : null}
-            {option}
-          </Button>
-        ))}
-      </div>
+      <div className="flex flex-col gap-3">
+        <div className="px-4 sm:px-8 space-y-2 sm:space-y-2.5">
+          {currentQuestion.options.map((option) => (
+            <Button
+              key={option}
+              variant={getOptionVariant(option)}
+              className="w-full justify-center gap-2 sm:h-12 sm:px-4 sm:text-lg sm:font-semibold"
+              onClick={() => handleSelect(option)}
+              disabled={isAnswered}
+              size="default"
+            >
+              {isAnswered && option === currentQuestion.correctAnswer ? (
+                <CheckCircle2 className="h-5 w-5" />
+              ) : isAnswered && option === selectedOption ? (
+                <XCircle className="h-5 w-5" />
+              ) : null}
+              {option}
+            </Button>
+          ))}
+        </div>
 
-      {!isLastQuestion && (
-        <Button
-          className="w-full"
-          variant="outline"
-          disabled={!isAnswered}
-          onClick={handleNext}
-        >
-          Next
-        </Button>
-      )}
+        {!isLastQuestion && (
+          <Button
+            className="w-full"
+            variant="outline"
+            disabled={!isAnswered}
+            onClick={handleNext}
+          >
+            Next
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

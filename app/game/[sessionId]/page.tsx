@@ -28,7 +28,7 @@ export default async function GamePage({ params, searchParams }: GamePageProps) 
   const questions = raw.results.map((q, i) => mapQuestion(q, i))
 
   return (
-    <main className="flex min-h-screen items-center justify-center h-screen">
+    <main className="flex h-dvh items-center justify-center">
       <div className="w-full max-w-4xl px-4 h-full">
         <GameClient questions={questions} sessionId={sessionId} categoryId={Number(categoryId)} difficulty={difficulty} />
       </div>
