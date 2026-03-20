@@ -7,7 +7,7 @@ import { TRIVIA_DEFAULTS } from '@/types/trivia'
 
 interface GamePageProps {
   params: Promise<{ sessionId: string }>
-  searchParams: Promise<{ categoryId: string; difficulty: string }>
+  searchParams: Promise<{ categoryId?: string; difficulty?: string }>
 }
 
 const ERROR_MESSAGES: Partial<Record<number, { title: string; description: string }>> = {
@@ -38,20 +38,31 @@ function ErrorPage({ code }: { code: number }) {
 export default async function GamePage({ params, searchParams }: GamePageProps) {
   const { sessionId } = await params
   const { categoryId, difficulty } = await searchParams
+  const parsedCategoryId = Number(categoryId)
+
+  if (!categoryId || !difficulty || Number.isNaN(parsedCategoryId)) {
+    return <ErrorPage code={-1} />
+  }
 
   const config: TriviaConfig = {
     ...TRIVIA_DEFAULTS,
-    categoryId: Number(categoryId),
+    categoryId: parsedCategoryId,
     categoryName: '',
     difficulty: difficulty as TriviaConfig['difficulty'],
   }
 
-  let raw = await fetchQuestions(sessionId, config)
+  let raw
 
-  // Token exhausted — reset and retry once
-  if (raw.response_code === 4) {
-    await resetSession(sessionId)
+  try {
     raw = await fetchQuestions(sessionId, config)
+
+    // Token exhausted — reset and retry once
+    if (raw.response_code === 4) {
+      await resetSession(sessionId)
+      raw = await fetchQuestions(sessionId, config)
+    }
+  } catch {
+    return <ErrorPage code={-1} />
   }
 
   if (raw.response_code !== 0) {
@@ -63,7 +74,7 @@ export default async function GamePage({ params, searchParams }: GamePageProps) 
   return (
     <main className="flex h-dvh items-center justify-center">
       <div className="w-full max-w-4xl px-4 h-full">
-        <GameClient questions={questions} sessionId={sessionId} categoryId={Number(categoryId)} difficulty={difficulty} />
+        <GameClient questions={questions} sessionId={sessionId} categoryId={parsedCategoryId} difficulty={difficulty} />
       </div>
     </main>
   )

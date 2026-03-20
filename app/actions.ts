@@ -16,7 +16,12 @@ export async function startGame(formData: FormData) {
   let sessionId = cookieStore.get(TOKEN_COOKIE)?.value
 
   if (!sessionId) {
-    sessionId = await fetchSession()
+    try {
+      sessionId = await fetchSession()
+    } catch {
+      redirect('/?error=session')
+    }
+
     cookieStore.set(TOKEN_COOKIE, sessionId, { maxAge: TOKEN_MAX_AGE, httpOnly: true })
   }
 

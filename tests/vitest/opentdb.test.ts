@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { fetchSession, fetchCategories, fetchQuestions } from '@/lib/opentdb'
+import { OpenTDBError, fetchSession, fetchCategories, fetchQuestions } from '@/lib/opentdb'
 import type { TriviaConfig } from '@/types/trivia'
 
 const BASE_URL = process.env.OPENTDB_BASE_URL ?? 'https://opentdb.com'
@@ -11,8 +11,10 @@ const mockConfig: TriviaConfig = {
   amount: 5,
 }
 
-function mockFetch(data: unknown) {
+function mockFetch(data: unknown, init?: { ok?: boolean; status?: number }) {
   return vi.fn().mockResolvedValue({
+    ok: init?.ok ?? true,
+    status: init?.status ?? 200,
     json: () => Promise.resolve(data),
   })
 }
@@ -39,6 +41,12 @@ describe('fetchSession', () => {
       `${BASE_URL}/api_token.php?command=request`
     )
   })
+
+  it('throws when OpenTDB rejects the session request', async () => {
+    global.fetch = mockFetch({ response_code: 3, token: '' })
+
+    await expect(fetchSession()).rejects.toBeInstanceOf(OpenTDBError)
+  })
 })
 
 describe('fetchCategories', () => {
@@ -60,6 +68,12 @@ describe('fetchCategories', () => {
 
     expect(result.trivia_categories).toHaveLength(1)
     expect(result.trivia_categories[0].id).toBe(9)
+  })
+
+  it('throws when the categories request returns a non-ok status', async () => {
+    global.fetch = mockFetch({}, { ok: false, status: 503 })
+
+    await expect(fetchCategories()).rejects.toBeInstanceOf(OpenTDBError)
   })
 })
 
@@ -84,5 +98,11 @@ describe('fetchQuestions', () => {
 
     expect(result.response_code).toBe(0)
     expect(result.results).toHaveLength(1)
+  })
+
+  it('throws when the questions payload is invalid', async () => {
+    global.fetch = mockFetch({ response_code: 0 })
+
+    await expect(fetchQuestions('token-xyz', mockConfig)).rejects.toBeInstanceOf(OpenTDBError)
   })
 })
